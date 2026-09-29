@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Supplier Order Labels</title>
+  <style>
+    :root {
+      --sz: 11pt
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: #f3f6fb;
+      color: #1c2b3c;
+      font: 16px system-ui, Arial, sans-serif
+    }
+
+    .app {
+      max-width: 1040px;
+      margin: 28px auto;
+      padding: 0 16px
+    }
+
+    .card {
+      background: #fff;
+      padding: 22px;
+      border-radius: 12px;
+      margin: 18px 0;
+      box-shadow: 0 2px 14px #0001
+    }
+
+    input,
+    select,
+    textarea {
+      font: inherit;
+      margin: 8px 0
+    }
+
+    select {
+      max-width: 100%;
+      padding: 8px
+    }
+
+    textarea {
+      width: 100%;
+      height: 85px
+    }
+
+    button {
+      font: inherit;
+      background: #155cc5;
+      color: #fff;
+      border: 0;
+      padding: 11px 17px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px 4px 5px 0
+    }
+
+    button:disabled {
+      background: #a7b2c0;
+      cursor: not-allowed
+    }
+
+    .muted {
+      color: #64758a
+    }
+
+    .bad {
+      color: #ad2733
+    }
+
+    .good {
+      color: #157042
+    }
+
+    .warn {
+      color: #8a5600
+    }
+
+    .tablewrap {
+      max-height: 380px;
+      overflow: auto
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%
+    }
+
+    th,
+    td {
+      text-align: left;
+      border-bottom: 1px solid #dde3ea;
+      padding: 8px;
+      font-size: 14px
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #edf2f8
+    }
+
+    .page {
+      width: 8.5in;
+      height: 11in;
+      padding: .35in;
+      background: #fff;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(5, minmax(0, 1fr));
+      column-gap: .18in;
+      margin: 22px auto;
+      box-shadow: 0 3px 15px #0002;
+      break-after: page
+    }
+
+    .page:last-child {
+      break-after: auto
+    }
+
+    .label {
+      border: 1px solid #cdd4dc;
+      padding: 9px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow-wrap: anywhere;
+      overflow: hidden;
+      font: var(--sz)/1.22 Arial, sans-serif
+    }
+
+    .name {
+      font-weight: bold
+    }
+
+    @page {
+      size: letter;
+      margin: 0
+    }
+
+    @media print {
+      body {
+        background: #fff
+      }
+
+      .app {
+        display: none
+      }
+
+      .page {
+        margin: 0;
+        box-shadow: none;
+        break-after: page
+      }
+
+      .page:last-child {
+        break-after: auto
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <h1>Supplier Order Labels</h1>
+    <p class="muted">Choose exactly one Excel tab. Match supplier PDF
+      <b>ORDER</b> numbers to that tab's <b>W/O #</b> values, then print
+      centered labels.</p>
+    <section class="card"><label><b>1. Upload Excel workbook</b><br><input
+          id="excel" type="file" accept=".xlsx"></label><br><label><b>2. Select
+          Excel tab</b><br><select id="sheet" disabled>
+          <option value="">Upload workbook first</option>
+        </select></label><br><label><b>3. Upload supplier PDF</b><br><input
+          id="pdf" type="file" accept=".pdf"></label>
+      <details>
+        <summary>If automatic PDF reading is blocked, paste extracted PDF text
+        </summary><textarea id="paste"
+          placeholder="1024137 Animakee...&#10;1024433 Barker..."></textarea>
+      </details><label>Font size: <strong id="sizeText">11 pt</strong><br><input
+          id="font" type="range" min="7" max="18" value="11"></label><br><button
+        id="search" disabled>Search selected tab</button><button id="print"
+        disabled>Print / Save PDF</button>
+      <p id="status" role="status"></p>
+      <p class="muted">Open this HTML file in current Chrome or Edge. Internet
+        is needed to load PDF.js for automatic PDF extraction; Excel is read
+        locally. Text-based PDFs only; scanned PDFs need OCR. The original
+        workbook is not modified.</p>
+    </section>
+    <section id="review" class="card" hidden>
+      <h2>Matches to review</h2>
+      <p id="summary"></p>
+      <p id="missing" class="warn"></p>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Print</th>
+              <th>W/O #</th>
+              <th>Customer (P.O. Number)</th>
+              <th>Location</th>
+              <th>Excel row</th>
+            </tr>
+          </thead>
+          <tbody id="results"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <div id="pages"></div>
+  <script>
+    'use strict';
+    const F = ['P.O. Number', 'W/O #', 'Supply/Install Where', '# Windows',
+        'Other Products on Order'
+      ],
+      $ = x => document.getElementById(x),
+      dec = new TextDecoder();
+    let book = null,
+      match = [];
+    const norm = x => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
+      kids = (e, n) => Array.from(e?.children || []).filter(x => x.localName ===
+        n),
+      all = (e, n) => Array.from(e?.getElementsByTagName('*') || []).filter(x =>
+        x.localName === n),
+      one = (e, n) => all(e, n)[0];
+
+    function xml(s) {
+      const d = new DOMParser().parseFromString(s, 'application/xml');
+      if (d.getElementsByTagName('parsererror').length) throw Error(
+        'Invalid Excel XML');
+      return d
+    }
+
+    function column(s) {
+      let n = 0;
+      for (const c of (s.match(/^[A-Z]+/i) || [''])[0].toUpperCase()) n = n *
+        26 + c.charCodeAt(0) - 64;
+      return n
+    }
+
+    function joined(base, target) {
+      if (target.startsWith('/')) return target.slice(1);
+      const a = base.split('/');
+      a.pop();
+      for (const x of target.split('/')) {
+        if (x === '..') a.pop();
+        else if (x !== '.') a.push(x)
+      }
+      return a.join('/')
+    }
+    async function zipOpen(bytes) {
+      const v = new DataView(bytes),
+        u = new Uint8Array(bytes);
+      let end = -1;
+      for (let i = bytes.byteLength - 22; i >= Math.max(0, bytes.byteLength -
+          65557); i--)
+        if (v.getUint32(i, true) === 0x06054b50) {
+          end = i;
+          break
+        } if (end < 0) throw Error('Not a valid .xlsx file');
+      const files = new Map();
+      let p = v.getUint32(end + 16, true);
+      for (let i = 0; i < v.getUint16(end + 10, true); i++) {
+        if (v.getUint32(p, true) !== 0x02014b50) throw Error(
+          'Damaged Excel ZIP');
+        const nl = v.getUint16(p + 28, true),
+          el = v.getUint16(p + 30, true),
+          cl = v.getUint16(p + 32, true),
+          name = dec.decode(u.subarray(p + 46, p + 46 + nl));
+        files.set(name, {
+          method: v.getUint16(p + 10, true),
+          length: v.getUint32(p + 20, true),
+          offset: v.getUint32(p + 42, true)
+        });
+        p += 46 + nl + el + cl
+      }
+      return {
+        has: n => files.has(n),
+        async read(n) {
+          const f = files.get(n);
+          if (!f) throw Error('Workbook part missing: ' + n);
+          const p = f.offset,
+            s = p + 30 + v.getUint16(p + 26, true) + v.getUint16(p + 28,
+              true),
+            data = u.slice(s, s + f.length);
+          if (f.method === 0) return dec.decode(data);
+          if (f.method !== 8 || !window.DecompressionStream) throw Error(
+            'Use current Chrome or Edge for Excel decompression');
+          return dec.decode(await new Response(new Blob([data]).stream()
+              .pipeThrough(new DecompressionStream('deflate-raw')))
+            .arrayBuffer())
+        }
+      }
+    }
+
+    function parseRow(row, strings) {
+      const values = new Map();
+      for (const c of kids(row, 'c')) {
+        const ix = column(c.getAttribute('r') || '');
+        if (!ix) continue;
+        const t = c.getAttribute('t');
+        let val = t === 'inlineStr' ? all(c, 't').map(x => x.textContent).join(
+          '') : one(c, 'v')?.textContent || '';
+        if (t === 's') val = strings[Number(val)] || '';
+        values.set(ix, String(val).trim())
+      }
+      return values
+    }
+    async function workbook(file) {
+      const z = await zipOpen(await file.arrayBuffer()),
+        root = xml(await z.read('xl/workbook.xml')),
+        rels = xml(await z.read('xl/_rels/workbook.xml.rels')),
+        targets = new Map(all(rels, 'Relationship').map(x => [x.getAttribute(
+          'Id'), x.getAttribute('Target')])),
+        strings = z.has('xl/sharedStrings.xml') ? all(xml(await z.read(
+          'xl/sharedStrings.xml')), 'si').map(si => all(si, 't').map(t => t
+          .textContent).join('')) : [],
+        sheets = [];
+      for (const s of all(root, 'sheet')) {
+        const id = Array.from(s.attributes).find(a => a.localName === 'id')
+          ?.value,
+          target = targets.get(id);
+        if (target) sheets.push({
+          name: s.getAttribute('name'),
+          path: joined('xl/workbook.xml', target)
+        })
+      }
+      return {
+        zip: z,
+        strings,
+        sheets
+      }
+    }
+    async function selectedRows() {
+      const sheet = book.sheets[Number($('sheet').value)];
+      if (!sheet) throw Error('Select an Excel tab first');
+      const d = xml(await book.zip.read(sheet.path)),
+        rows = all(d, 'sheetData').flatMap(x => kids(x, 'row'));
+      if (!rows.length) throw Error('Selected tab is empty');
+      const header = new Map([...parseRow(rows[0], book.strings)].map(([c,
+        v]) => [norm(v), c]));
+      if (!F.every(x => header.has(norm(x)))) throw Error(
+        'The selected tab is missing one or more of the five label headings. Choose a window-order tab with P.O. Number, W/O #, Supply/Install Where, # Windows, and Other Products on Order.'
+        );
+      const cols = F.map(x => header.get(norm(x)));
+      return rows.slice(1).map(r => {
+        const map = parseRow(r, book.strings);
+        return {
+          values: cols.map(c => map.get(c) || ''),
+          row: r.getAttribute('r')
+        }
+      }).filter(r => r.values[0] && r.values[1])
+    }
+
+    function pastedOrders(text) {
+      const set = new Set();
+      for (const line of text.split(/\r?\n/)) {
+        const m = line.trim().match(/^(S?\d{7,8})(?!\d)/i);
+        if (m) set.add(m[1].toUpperCase())
+      }
+      return [...set]
+    }
+    async function pdfLibrary() {
+      if (window.pdfjsLib) return window.pdfjsLib;
+      for (const src of [
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+          'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'
+        ]) {
+        try {
+          await new Promise((ok, bad) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = ok;
+            s.onerror = bad;
+            document.head.append(s)
+          });
+          if (window.pdfjsLib) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = src.replace(
+              'pdf.min.js', 'pdf.worker.min.js');
+            return window.pdfjsLib
+          }
+        } catch (e) {}
+      }
+      throw Error(
+        'Could not load PDF.js. Connect to the internet or paste extracted PDF text above.'
+        )
+    }
+    async function pdfOrders(file) {
+      const lib = await pdfLibrary(),
+        doc = await lib.getDocument({
+          data: new Uint8Array(await file.arrayBuffer()),
+          disableWorker: true
+        }).promise,
+        out = new Set();
+      for (let n = 1; n <= doc.numPages; n++) {
+        const page = await doc.getPage(n),
+          content = await page.getTextContent(),
+          width = page.view[2] - page.view[0],
+          lines = [];
+        for (const item of content.items) {
+          if (!item.str?.trim()) continue;
+          const x = item.transform[4],
+            y = item.transform[5];
+          let line = lines.find(z => Math.abs(z.y - y) < 2.5);
+          if (!line) {
+            line = {
+              y,
+              parts: []
+            };
+            lines.push(line)
+          }
+          line.parts.push({
+            x,
+            s: item.str.trim()
+          })
+        }
+        for (const line of lines) {
+          line.parts.sort((a, b) => a.x - b.x);
+          if (!line.parts.length || line.parts[0].x > page.view[0] + width *
+            .20) continue;
+          const text = line.parts.map(z => z.s).join(' ').replace(
+              /\bS\s+(?=\d)/gi, 'S'),
+            m = text.match(/^\s*(S?\d{7,8})(?!\d)/i);
+          if (m) out.add(m[1].toUpperCase())
+        }
+      }
+      return [...out]
+    }
+
+    function render() {
+      const selected = match.filter(x => x.include),
+        pages = $('pages');
+      pages.replaceChildren();
+      for (let i = 0; i < selected.length; i += 10) {
+        const page = document.createElement('section');
+        page.className = 'page';
+        for (const row of selected.slice(i, i + 10)) {
+          const label = document.createElement('div');
+          label.className = 'label';
+          row.values.forEach((v, j) => {
+            if (!v) return;
+            const e = document.createElement('div');
+            e.textContent = v;
+            if (j === 0) e.className = 'name';
+            label.append(e)
+          });
+          page.append(label)
+        }
+        pages.append(page)
+      }
+      $('summary').textContent =
+        `${selected.length} selected labels from ${match.length} matching rows on the selected tab. One label per Excel row.`;
+      $('print').disabled = !selected.length
+    }
+    $('excel').addEventListener('change', async e => {
+      book = null;
+      $('sheet').disabled = true;
+      $('search').disabled = true;
+      $('review').hidden = true;
+      $('print').disabled = true;
+      $('pages').replaceChildren();
+      if (!e.target.files[0]) return;
+      try {
+        $('status').className = '';
+        $('status').textContent = 'Loading workbook tabs…';
+        book = await workbook(e.target.files[0]);
+        const list = $('sheet');
+        list.replaceChildren();
+        const prompt = document.createElement('option');
+        prompt.value = '';
+        prompt.textContent = 'Select a tab';
+        list.append(prompt);
+        book.sheets.forEach((s, i) => {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = s.name;
+          list.append(option)
+        });
+        list.disabled = false;
+        $('status').className = 'good';
+        $('status').textContent =
+          `Found ${book.sheets.length} tabs. Choose the supplier's tab.`
+      } catch (err) {
+        $('status').className = 'bad';
+        $('status').textContent = err.message || String(err)
+      }
+    });
+    $('sheet').addEventListener('change', () => {
+      $('search').disabled = !book || $('sheet').value === '';
+      $('review').hidden = true;
+      $('print').disabled = true;
+      $('pages').replaceChildren()
+    });
+    $('search').addEventListener('click', async () => {
+      try {
+        if (!$('pdf').files[0] && !$('paste').value.trim()) throw Error(
+          'Upload the supplier PDF or paste its extracted text.');
+        $('status').className = '';
+        $('status').textContent = 'Reading selected tab…';
+        const rows = await selectedRows();
+        $('status').textContent = 'Reading manifest ORDER numbers…';
+        const orders = $('paste').value.trim() ? pastedOrders($('paste')
+          .value) : await pdfOrders($('pdf').files[0]);
+        if (!orders.length) throw Error(
+          'No ORDER numbers found. A scanned PDF needs OCR; alternatively paste its extracted text.'
+          );
+        const set = new Set(orders),
+          found = new Set();
+        match = rows.filter(r => {
+          const wo = r.values[1].toUpperCase().replace(/\s/g, '');
+          if (set.has(wo)) {
+            found.add(wo);
+            return true
+          }
+          return false
+        }).sort((a, b) => a.values[0].localeCompare(b.values[0],
+          undefined, {
+            sensitivity: 'base',
+            numeric: true
+          }) || a.values[1].localeCompare(b.values[1], undefined, {
+          numeric: true
+        }) || Number(a.row) - Number(b.row)).map(x => ({
+          ...x,
+          include: true
+        }));
+        const tbody = $('results');
+        tbody.replaceChildren();
+        for (const r of match) {
+          const tr = document.createElement('tr'),
+            td = document.createElement('td'),
+            cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = true;
+          cb.addEventListener('change', () => {
+            r.include = cb.checked;
+            render()
+          });
+          td.append(cb);
+          tr.append(td);
+          for (const v of [r.values[1], r.values[0], r.values[2], r
+            .row]) {
+            const cell = document.createElement('td');
+            cell.textContent = v;
+            tr.append(cell)
+          }
+          tbody.append(tr)
+        }
+        const missing = orders.filter(x => !found.has(x));
+        $('missing').textContent = missing.length ?
+          `${missing.length} manifest ORDER numbers not found on this tab: ${missing.slice(0,40).join(', ')}${missing.length>40?' …':''}` :
+          'Every detected manifest ORDER number was found on this tab.';
+        $('review').hidden = false;
+        $('status').className = 'good';
+        $('status').textContent =
+          `Search complete: ${match.length} matching Excel rows on “${book.sheets[Number($('sheet').value)].name}”.`;
+        render()
+      } catch (err) {
+        $('status').className = 'bad';
+        $('status').textContent = err.message || String(err)
+      }
+    });
+    $('font').addEventListener('input', e => {
+      document.documentElement.style.setProperty('--sz', e.target.value +
+        'pt');
+      $('sizeText').textContent = e.target.value + ' pt'
+    });
+    $('print').addEventListener('click', () => window.print());
+  </script>
+</body>
+</html>
