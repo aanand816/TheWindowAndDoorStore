@@ -356,17 +356,28 @@
     }
 
     function addRow(v = {}) {
-      const r = document.createElement('tr');
-      r.innerHTML =
-        `<td class="seq"></td><td><input class="qty" type="number" min="1" step="1" value="${v.qty ?? 1}"></td><td><input class="base" type="number" min="0" step="0.01" value="${v.base ?? ''}" placeholder="0.00"></td><td><input class="argon component" type="text" inputmode="decimal" value="${v.argon ?? ''}" placeholder="0.00"></td><td><input class="solar component" type="text" inputmode="decimal" value="${v.solar ?? ''}" placeholder="0.00"></td><td><input class="triple component" type="text" inputmode="decimal" value="${v.triple ?? ''}" placeholder="0.00"></td><td><button class="danger remove" type="button">Remove</button></td>`;
-      r.querySelectorAll('.component').forEach(setupComponentField);
-      r.querySelector('.remove').onclick = () => {
-        r.remove();
-        renumber()
-      };
-      rows.appendChild(r);
-      renumber();
-      return r
+    const r = document.createElement('tr');
+    r.innerHTML =
+    `<td class="seq"></td>
+    <td><input class="qty" type="number" min="1" step="1" value="${v.qty ?? 1}">
+    </td>
+    <td><input class="base" type="number" min="0" step="0.01"
+        value="${v.base ?? ''}" placeholder="0.00"></td>
+    <td><input class="argon component" type="text" inputmode="decimal"
+        value="${v.argon ?? ''}" placeholder="0.00"></td>
+    <td><input class="solar component" type="text" inputmode="decimal"
+        value="${v.solar ?? ''}" placeholder="0.00"></td>
+    <td><input class="triple component" type="text" inputmode="decimal"
+        value="${v.triple ?? ''}" placeholder="0.00"></td>
+    <td><button class="danger remove" type="button">Remove</button></td>`;
+    r.querySelectorAll('.component').forEach(setupComponentField);
+    r.querySelector('.remove').onclick = () => {
+    r.remove();
+    renumber()
+    };
+    rows.appendChild(r);
+    renumber();
+    return r
     }
 
     function renumber() {
