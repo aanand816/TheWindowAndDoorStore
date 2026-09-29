@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Window Quote PDF Studio</title>
+  <style>
+    :root {
+      font: 14px Arial;
+      color: #26384b;
+      background: #f5f8fc
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      max-width: 1100px;
+      margin: auto;
+      padding: 24px 18px 50px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.65rem
+    }
+
+    .sub,
+    .hint {
+      color: #697b8e
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e0e9f2;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 14px 0;
+      box-shadow: 0 3px 12px #26384a09
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px
+    }
+
+    label {
+      display: block;
+      font-size: .88rem;
+      font-weight: 600;
+      color: #465a70;
+      margin: 7px 0
+    }
+
+    input,
+    textarea,
+    button {
+      font: inherit
+    }
+
+    input:not([type=file]):not([type=radio]),
+    textarea {
+      width: 100%;
+      border: 1px solid #c9d6e5;
+      border-radius: 8px;
+      padding: 9px;
+      margin-top: 5px
+    }
+
+    textarea {
+      height: 82px
+    }
+
+    button {
+      background: #276caa;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 15px;
+      cursor: pointer;
+      margin: 5px
+    }
+
+    button.secondary {
+      background: #e9f1fa;
+      color: #285981
+    }
+
+    button.danger {
+      background: #fbe9e9;
+      color: #a43636
+    }
+
+    .choices {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .choices label {
+      background: #f7fbff;
+      padding: 11px;
+      border: 1px solid #d8e4f0;
+      border-radius: 8px
+    }
+
+    .choices label:has(input:checked) {
+      background: #eaf5ff;
+      border-color: #3282c5
+    }
+
+    details {
+      border: 1px solid #dbe6f0;
+      padding: 13px;
+      border-radius: 9px
+    }
+
+    summary {
+      cursor: pointer;
+      color: #285a86;
+      font-weight: 700
+    }
+
+    .row {
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid #dce6ef;
+      border-radius: 8px
+    }
+
+    .row.child {
+      margin-left: 22px;
+      border-left: 4px solid #90b6d4
+    }
+
+    .rowhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .thumb {
+      width: 110px;
+      height: 100px;
+      object-fit: contain;
+      border: 1px solid #d4dfe9;
+      border-radius: 5px
+    }
+
+    .status {
+      white-space: pre-wrap;
+      color: #536779
+    }
+
+    iframe {
+      width: 100%;
+      height: 650px;
+      border: 1px solid #ccdbe9;
+      border-radius: 8px
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Window Quote PDF Studio</h1>
+  <p class="sub">Customer-facing Supply or Install quotes from supplier
+    quote-list PDFs.</p>
+  <section class="card">
+    <h2>1. Upload quote</h2><label>Quote-list PDF<input id="source" type="file"
+        accept="application/pdf,.pdf"></label><button id="extract">Extract quote
+      and drawings</button>
+    <p id="importStatus" class="status">Internet is required for PDF libraries.
+    </p>
+  </section>
+  <section class="card">
+    <h2>2. Quote type</h2>
+    <div class="choices"><label><input type="radio" name="mode" value="supply"
+          checked> Supply: FR, BM if present, R/O on
+        parents</label><label><input type="radio" name="mode" value="install">
+        Install: size column blank</label></div>
+    <p class="hint">Child quantity and size stay blank in either PDF.</p>
+  </section>
+  <section class="card">
+    <h2>3. Branding</h2>
+    <div class="grid"><label>Customer reference<input
+          id="customer"></label><label>Quote number<input
+          id="quote"></label><label>Company name<input id="company"
+          value="The Window &amp; Door Store"></label><label>Logo<input
+          id="logo" type="file" accept="image/png,image/jpeg"></label></div>
+    <label>Address/contact<textarea id="address">305 Kirsti Pl
+HWY 11/71 W
+Fort Frances, ON P9A 3V9
+PH: 1 807 274-0302</textarea></label>
+  </section>
+  <section class="card">
+    <details id="details">
+      <summary>Show windows details (<span id="count">0</span>)</summary>
+      <div id="rows"></div><button id="add" class="secondary">Add
+        window</button>
+    </details>
+  </section>
+  <section class="card">
+    <h2>4. Generate</h2><button id="generate">Generate PDF</button><button
+      id="download" class="secondary" disabled>Download PDF</button>
+    <p id="outputStatus" class="status"></p><iframe id="preview" hidden
+      title="PDF preview"></iframe>
+  </section>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
+  </script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js">
+  </script>
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id),
+      field = (r, k) => r.querySelector(`[data-key="${k}"]`).value.trim();
+    let pdfUrl = null;
+    const cash = n => Number(n).toLocaleString('en-CA', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function dataUrl(file) {
+      return new Promise((ok, no) => {
+        const fr = new FileReader();
+        fr.onload = () => ok(fr.result);
+        fr.onerror = no;
+        fr.readAsDataURL(file)
+      })
+    }
+
+    function count() {
+      $('count').textContent = $('rows').children.length
+    }
+
+    function add(d = {}) {
+      const row = document.createElement('div');
+      row.className = 'row' + (d.child ? ' child' : '');
+      row.dataset.child = d.child ? '1' : '0';
+      const head = document.createElement('div');
+      head.className = 'rowhead';
+      const title = document.createElement('strong');
+      title.textContent = 'Window ' + (d.id || 'new') + (d.child ? ' · child' :
+        '');
+      head.append(title);
+      const remove = document.createElement('button');
+      remove.className = 'danger';
+      remove.textContent = 'Remove';
+      remove.onclick = () => {
+        row.remove();
+        count()
+      };
+      head.append(remove);
+      row.append(head);
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+      for (const [key, label] of [
+          ['id', 'Item'],
+          ['name', 'Description'],
+          ['qty', 'Quantity'],
+          ['fr', 'FR size'],
+          ['bm', 'BM size'],
+          ['ro', 'R/O size'],
+          ['price', 'Extended list total']
+        ]) {
+        const wrap = document.createElement('label');
+        wrap.textContent = label;
+        const input = document.createElement('input');
+        input.dataset.key = key;
+        input.value = d[key] || '';
+        wrap.append(input);
+        grid.append(wrap)
+      }
+      row.append(grid);
+      const label = document.createElement('label');
+      label.textContent = 'Options and performance';
+      const options = document.createElement('textarea');
+      options.dataset.key = 'options';
+      options.value = d.options || '';
+      label.append(options);
+      row.append(label);
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.hidden = !d.image;
+      img.alt = 'Window image';
+      if (d.image) {
+        row.dataset.image = d.image;
+        img.src = d.image
+      }
+      row.append(img);
+      const upload = document.createElement('input');
+      upload.type = 'file';
+      upload.accept = 'image/png,image/jpeg';
+      upload.onchange = async () => {
+        if (!upload.files[0]) return;
+        row.dataset.image = await dataUrl(upload.files[0]);
+        img.src = row.dataset.image;
+        img.hidden = false
+      };
+      row.append(document.createTextNode(' Replace image: '), upload);
+      $('rows').append(row);
+      count();
+      return row
+    }
+
+    function plusOne(part) {
+      const m = part.trim().match(/^(\d+)(?:\s+(\d+)\/(\d+))?$/);
+      return m ? String(Number(m[1]) + 1) + (m[2] ? ' ' + m[2] + '/' + m[3] :
+        '') : null
+    }
+
+    function rough(size) {
+      const m = size.match(
+        /^(\d+(?:\s+\d+\/\d+)?)\s*X\s*(\d+(?:\s+\d+\/\d+)?)$/i);
+      return m ? plusOne(m[1]) + ' X ' + plusOne(m[2]) : ''
+    }
+
+    function pretty(size) {
+      const m = size.match(
+        /^(\d+(?:\s+\d+\/\d+)?)\s*X\s*(\d+(?:\s+\d+\/\d+)?)$/i);
+      return m ? `${m[1]}" wide X ${m[2]}" high` : size
+    }
+
+    function lines(items) {
+      const out = [];
+      for (const item of items) {
+        if (!item.str.trim()) continue;
+        const x = item.transform[4],
+          y = item.transform[5];
+        let r = out.find(a => Math.abs(a.y - y) < 2.5);
+        if (!r) {
+          r = {
+            y,
+            parts: []
+          };
+          out.push(r)
+        }
+        r.parts.push({
+          x,
+          text: item.str.trim()
+        })
+      }
+      return out.sort((a, b) => b.y - a.y).map(r => ({
+        y: r.y,
+        text: r.parts.sort((a, b) => a.x - b.x).map(t => t.text).join(' ')
+          .replace(/\s+/g, ' ').trim()
+      }))
+    }
+    const rowPattern = s => s.match(
+      /^\s*(\d+(?:\.\d+)?)\s+(.+?)\s+(\d+)\s+FR:\s*([^$]+?)(?:\s+\$([\d,]+\.\d{2})\s+\$([\d,]+\.\d{2}))?\s*$/i
+      );
+    const boundary = s =>
+      /^(?:LINE ITEM TOTAL\s*:|TOTALS\s*:|SUBTOTAL\s*:|TOTAL\s*:|COMMENT\s*:|ITEM\s+DESCRIPTION\s+QTY|ORDER\s+ORDER DATE|QUOTE LIST\b|QUOTE\s*:|QUOTE DATE\s*:|QUOTE CONTACT\s*:|\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}:\d{2}|\d+\s+of\s+\d+\b|v\d+\s*$)/i
+      .test(s.trim());
+
+    function optionsIn(data, start, end) {
+      let bm = '',
+        text = [];
+      for (let i = start; i < end; i++) {
+        const s = data[i].text.trim();
+        if (boundary(s) || /^\$[\d,]+\.\d{2}|^Area:|^Perimeter:/i.test(s))
+      break;
+        if (/^BM\s*:/i.test(s)) {
+          bm = s.replace(/^BM\s*:/i, '').trim();
+          continue
+        }
+        text.push(s)
+      }
+      return {
+        bm,
+        options: text.join(' ').replace(/\s+/g, ' ').trim()
+      }
+    }
+
+    function mult(a, b) {
+      return [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[
+        2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], a[0] * b[4] + a[2] * b[
+        5] + a[4], a[1] * b[4] + a[3] * b[5] + a[5]
+      ]
+    }
+
+    function bbox(t) {
+      const p = [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1]
+      ].map(([x, y]) => ({
+        x: t[0] * x + t[2] * y + t[4],
+        y: t[1] * x + t[3] * y + t[5]
+      }));
+      return {
+        x0: Math.min(...p.map(z => z.x)),
+        x1: Math.max(...p.map(z => z.x)),
+        y0: Math.min(...p.map(z => z.y)),
+        y1: Math.max(...p.map(z => z.y))
+      }
+    }
+
+    function images(ops) {
+      const F = pdfjsLib.OPS;
+      let t = [1, 0, 0, 1, 0, 0],
+        stack = [],
+        result = [];
+      for (let i = 0; i < ops.fnArray.length; i++) {
+        const op = ops.fnArray[i],
+          arg = ops.argsArray[i];
+        if (op === F.save) stack.push([...t]);
+        else if (op === F.restore) t = stack.pop() || [1, 0, 0, 1, 0, 0];
+        else if (op === F.transform) t = mult(t, arg);
+        else if ([F.paintImageXObject, F.paintInlineImageXObject, F
+            .paintJpegXObject, F.paintImageMaskXObject
+          ].includes(op)) {
+          const b = bbox(t);
+          if (b.x1 - b.x0 > 8 && b.y1 - b.y0 > 8) result.push(b)
+        }
+      }
+      return result
+    }
+    async function crop(page, b) {
+      const vp = page.getViewport({
+          scale: 4
+        }),
+        c = document.createElement('canvas');
+      c.width = Math.ceil(vp.width);
+      c.height = Math.ceil(vp.height);
+      await page.render({
+        canvasContext: c.getContext('2d'),
+        viewport: vp
+      }).promise;
+      const pad = 1,
+        x = Math.max(0, Math.floor((b.x0 - pad) * 4)),
+        y = Math.max(0, Math.floor((page.view[3] - b.y1 - pad) * 4)),
+        w = Math.min(c.width - x, Math.ceil((b.x1 - b.x0 + pad * 2) * 4)),
+        h = Math.min(c.height - y, Math.ceil((b.y1 - b.y0 + pad * 2) * 4)),
+        out = document.createElement('canvas');
+      out.width = w;
+      out.height = h;
+      out.getContext('2d').drawImage(c, x, y, w, h, 0, 0, w, h);
+      return out.toDataURL('image/png')
+    }
+    async function extract() {
+      if (!window.pdfjsLib) throw Error('PDF.js did not load.');
+      const file = $('source').files[0];
+      if (!file) throw Error('Select a PDF.');
+      const doc = await pdfjsLib.getDocument({
+          data: new Uint8Array(await file.arrayBuffer())
+        }).promise,
+        result = [],
+        warnings = [],
+        all = [];
+      for (let p = 1; p <= doc.numPages; p++) {
+        const page = await doc.getPage(p),
+          data = lines((await page.getTextContent()).items),
+          placements = images(await page.getOperatorList());
+        all.push(...data.map(x => x.text));
+        for (let i = 0; i < data.length; i++) {
+          const m = rowPattern(data[i].text);
+          if (!m) continue;
+          let end = data.findIndex((l, j) => j > i && (rowPattern(l.text) ||
+            boundary(l.text)));
+          if (end < 0) end = data.length;
+          const detail = optionsIn(data, i + 1, end),
+            id = m[1],
+            found = placements.filter(b => b.x0 > page.view[2] * .65 && Math
+              .abs((b.y0 + b.y1) / 2 - data[i].y) < 125).sort((a, b) => Math
+              .abs((a.y0 + a.y1) / 2 - data[i].y) - Math.abs((b.y0 + b.y1) /
+                2 - data[i].y));
+          let image = null;
+          if (found.length) image = await crop(page, found[0]);
+          else warnings.push('No drawing for ' + id);
+          result.push({
+            id,
+            name: m[2].trim(),
+            qty: m[3],
+            fr: m[4].trim(),
+            bm: detail.bm,
+            ro: rough(m[4]),
+            price: m[6]?.replaceAll(',', '') || '',
+            options: detail.options,
+            child: id.includes('.'),
+            image
+          })
+        }
+      }
+      if (!result.length) throw Error('No supported window rows.');
+      const text = all.join('\n');
+      $('quote').value = text.match(/QUOTE:\s*(\d+)/i)?.[1] || '';
+      $('customer').value = text.match(
+        /\b\d{5,}\s+\d{1,2}\/\d{1,2}\/\d{4}\s+([^\n]+)/)?.[1]?.trim() || '';
+      $('rows').replaceChildren();
+      result.forEach(add);
+      $('details').open = true;
+      $('importStatus').textContent =
+        `Extracted ${result.length} rows. ${warnings.join('; ')} Check the preview before sending.`
+    }
+
+    function wrap(s, font, size, w) {
+      let result = [],
+        current = '';
+      for (const word of String(s).replace(/\s+/g, ' ').trim().split(' ')) {
+        const next = current ? current + ' ' + word : word;
+        if (current && font.widthOfTextAtSize(next, size) > w) {
+          result.push(current);
+          current = word
+        } else current = next
+      }
+      if (current) result.push(current);
+      return result
+    }
+    async function embed(doc, data) {
+      const bytes = await fetch(data).then(r => r.arrayBuffer());
+      return data.startsWith('data:image/png') ? doc.embedPng(bytes) : doc
+        .embedJpg(bytes)
+    }
+    async function generate() {
+      if (!window.PDFLib) throw Error('pdf-lib did not load.');
+      const rows = [...$('rows').children],
+        quote = $('quote').value.trim(),
+        customer = $('customer').value.trim();
+      if (!rows.length || !quote || !customer) throw Error(
+        'Quote, customer and rows required.');
+      const doc = await PDFLib.PDFDocument.create(),
+        reg = await doc.embedFont(PDFLib.StandardFonts.Helvetica),
+        bold = await doc.embedFont(PDFLib.StandardFonts.HelveticaBold),
+        gray = PDFLib.rgb(.5, .5, .5),
+        white = PDFLib.rgb(1, 1, 1),
+        black = PDFLib.rgb(0, 0, 0),
+        pages = [];
+      let page, y;
+      const draw = (s, x, z, size = 8, font = reg, color = black) => page
+        .drawText(String(s), {
+          x,
+          y: z,
+          size,
+          font,
+          color
+        });
+
+      function table() {
+        page.drawRectangle({
+          x: 10,
+          y: y - 18,
+          width: 592,
+          height: 18,
+          color: gray
+        });
+        [
+          ['ITEM', 15],
+          ['DESCRIPTION', 100],
+          ['QTY', 255],
+          ['SIZE', 315],
+          ['LIST', 481],
+          ['TOTAL', 545]
+        ].forEach(([s, x]) => draw(s, x, y - 13, 8, bold, white));
+        y -= 42
+      }
+      async function nextPage(first) {
+        page = doc.addPage([612, 792]);
+        pages.push(page);
+        if (first) {
+          draw('QUOTE: ' + quote, 477, 765, 10, bold);
+          const logo = $('logo').files[0],
+            head = [$('company').value.trim(), ...$('address').value.split(
+              '\n').map(s => s.trim())].filter(Boolean),
+            top = 735;
+          let logoH = 0;
+          if (logo) {
+            const im = await embed(doc, await dataUrl(logo)),
+              fit = im.scaleToFit(68, 88);
+            logoH = fit.height;
+            page.drawImage(im, {
+              x: 20 + (68 - fit.width) / 2,
+              y: top - fit.height,
+              width: fit.width,
+              height: fit.height
+            })
+          }
+          const lineH = 11,
+            bottom = top - Math.max(logoH, head.length * lineH),
+            headTop = bottom + head.length * lineH - lineH;
+          head.forEach((s, i) => draw(s, 104, headTop - i * lineH, 9, i ===
+            0 ? bold : reg));
+          page.drawRectangle({
+            x: 10,
+            y: 606,
+            width: 592,
+            height: 18,
+            color: gray
+          });
+          [
+            ['ORDER', 25],
+            ['ORDER DATE', 100],
+            ['PO NUMBER', 177],
+            ['CUSTOMER REF', 320],
+            ['TERMS', 528]
+          ].forEach(([s, x]) => draw(s, x, 611, 8, bold, white));
+          draw(quote, 25, 594, 9);
+          draw(customer, 320, 594, 9);
+          y = 578
+        } else y = 760;
+        table()
+      }
+      await nextPage(true);
+      const supply = document.querySelector('input[name="mode"]:checked')
+        .value === 'supply';
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i],
+          id = field(r, 'id'),
+          child = r.dataset.child === '1',
+          next = rows[i + 1],
+          nextChild = next && next.dataset.child === '1' && field(next, 'id')
+          .split('.')[0] === id.split('.')[0],
+          opts = wrap(field(r, 'options'), reg, 8, 180),
+          sizes = supply && !child ? [...wrap('FR: ' + pretty(field(r, 'fr')),
+            reg, 8, 160), ...(field(r, 'bm') ? wrap('BM: ' + pretty(field(r,
+            'bm')), reg, 8, 160) : []), ...(field(r, 'ro') ? wrap('R/O: ' +
+            pretty(field(r, 'ro')), reg, 8, 160) : [])] : [],
+          height = Math.max(90, opts.length * 11 + 34, sizes.length * 11 +
+          20);
+        if (y - height < 45) await nextPage(false);
+        const top = y;
+        draw(id || i + 1, 20, top);
+        draw(field(r, 'name'), 42, top);
+        if (!child) draw(field(r, 'qty'), 257, top);
+        sizes.forEach((s, j) => draw(s, 278, top - j * 11, 8));
+        opts.forEach((s, j) => draw(s, 42, top - 14 - j * 11));
+        if (field(r, 'price')) draw('$' + cash(field(r, 'price')), 505, top);
+        if (r.dataset.image) {
+          const im = await embed(doc, r.dataset.image),
+            fit = im.scaleToFit(72, 72),
+            x = 485 + (72 - fit.width) / 2;
+          page.drawImage(im, {
+            x,
+            y: top - 84 + (72 - fit.height) / 2,
+            width: fit.width,
+            height: fit.height
+          });
+          if (!child) {
+            const label = 'Outside view',
+              w = bold.widthOfTextAtSize(label, 8);
+            draw(label, 485 + (72 - w) / 2, top - 96, 8, bold)
+          }
+        }
+        y -= height;
+        if (!nextChild) {
+          page.drawLine({
+            start: {
+              x: 10,
+              y
+            },
+            end: {
+              x: 602,
+              y
+            },
+            thickness: 1,
+            color: black
+          });
+          y -= 17
+        }
+      }
+      pages.forEach((p, i) => p.drawText(`${i+1} of ${pages.length}`, {
+        x: 289,
+        y: 18,
+        font: reg,
+        size: 8
+      }));
+      const bytes = await doc.save();
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+      pdfUrl = URL.createObjectURL(new Blob([bytes], {
+        type: 'application/pdf'
+      }));
+      $('preview').src = pdfUrl;
+      $('preview').hidden = false;
+      $('download').disabled = false;
+      $('outputStatus').textContent =
+        `${supply?'Supply':'Install'} PDF ready. Parent sizes begin farther left; child QTY and SIZE remain blank.`
+    }
+
+    function safe(s) {
+      return s.trim().replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') ||
+        'Customer'
+    }
+    $('extract').onclick = async () => {
+      try {
+        $('importStatus').textContent = 'Reading PDF…';
+        await extract()
+      } catch (e) {
+        $('importStatus').textContent = 'Extraction stopped: ' + e.message
+      }
+    };
+    $('add').onclick = () => add();
+    $('generate').onclick = async () => {
+      try {
+        $('outputStatus').textContent = 'Generating…';
+        await generate()
+      } catch (e) {
+        $('outputStatus').textContent = 'Generation stopped: ' + e.message
+      }
+    };
+    $('download').onclick = () => {
+      if (!pdfUrl) return;
+      const a = document.createElement('a');
+      a.href = pdfUrl;
+      a.download =
+        `${safe($('customer').value)}-${safe($('quote').value)}QL.pdf`;
+      document.body.append(a);
+      a.click();
+      a.remove()
+    };
+  </script>
+</body>
+
+</html>
