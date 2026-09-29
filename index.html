@@ -2,407 +2,853 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Window Promo Quote Calculator</title>
-    <style>
-        :root {
-            font-family: Arial, sans-serif;
-            color: #17202a;
-            background: #f4f6f8
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Window Promo Quote Calculator</title>
+  <style>
+    :root {
+      font-family: Arial, sans-serif;
+      color: #17202a;
+      background: #f4f6f8
+    }
 
-        body {
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 16px
-        }
+    body {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px
+    }
 
-        h1 {
-            margin: 0 0 12px;
-            font-size: 1.4rem
-        }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.4rem
+    }
 
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            padding: 12px 14px;
-            margin: 10px 0;
-            box-shadow: 0 1px 6px #0001
-        }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      box-shadow: 0 1px 6px #0001
+    }
 
-        h2 {
-            margin: 0 0 8px;
-            font-size: 1.15rem
-        }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.15rem
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .9rem
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem
+    }
 
-        th,
-        td {
-            padding: 6px 5px;
-            border-bottom: 1px solid #e3e8ed;
-            text-align: left;
-            vertical-align: middle
-        }
+    th,
+    td {
+      padding: 6px 5px;
+      border-bottom: 1px solid #e3e8ed;
+      text-align: left;
+      vertical-align: middle
+    }
 
-        th {
-            font-weight: 600;
-            color: #334155
-        }
+    th {
+      font-weight: 600;
+      color: #334155
+    }
 
-        input,
-        select,
-        button {
-            padding: 6px 8px;
-            border: 1px solid #cfd8e3;
-            border-radius: 5px;
-            font: inherit;
-            background: #fff
-        }
+    input,
+    select,
+    button {
+      padding: 6px 8px;
+      border: 1px solid #cfd8e3;
+      border-radius: 5px;
+      font: inherit;
+      background: #fff
+    }
 
-        input[type=number] {
-            width: 82px;
-            -moz-appearance: textfield
-        }
+    input[type=number] {
+      width: 82px;
+      -moz-appearance: textfield
+    }
 
-        input[type=number]::-webkit-outer-spin-button,
-        input[type=number]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0
-        }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0
+    }
 
-        .component {
-            width: 82px
-        }
+    .component {
+      width: 82px
+    }
 
-        button {
-            cursor: pointer;
-            background: #1769aa;
-            color: #fff;
-            border: 0;
-            font-size: .9rem
-        }
+    button {
+      cursor: pointer;
+      background: #1769aa;
+      color: #fff;
+      border: 0;
+      font-size: .9rem
+    }
 
-        button.green {
-            background: #16803c
-        }
+    button.green {
+      background: #16803c
+    }
 
-        button.gray {
-            background: #52616b
-        }
+    button.gray {
+      background: #52616b
+    }
 
-        button.danger {
-            background: #b42318
-        }
+    button.danger {
+      background: #b42318
+    }
 
-        .button-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap
-        }
+    .button-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
 
-        .hint {
-            color: #5d6872;
-            font-size: .85rem;
-            margin: 6px 0 0
-        }
+    .hint {
+      color: #5d6872;
+      font-size: .85rem;
+      margin: 6px 0 0
+    }
 
-        .totals {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px
-        }
+    .totals {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px
+    }
 
-        .metric {
-            background: #eef5fb;
-            padding: 10px;
-            border-radius: 6px
-        }
+    .metric {
+      background: #eef5fb;
+      padding: 10px;
+      border-radius: 6px
+    }
 
-        .metric strong {
-            display: block;
-            font-size: 1.05rem;
-            margin-top: 3px
-        }
+    .metric strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-top: 3px
+    }
 
-        #error,
-        #taxError,
-        #fileStatus {
-            color: #b42318;
-            min-height: 1.2em;
-            font-size: .9rem
-        }
+    #error,
+    #taxError,
+    #fileStatus {
+      color: #b42318;
+      min-height: 1.2em;
+      font-size: .9rem
+    }
 
-        .success {
-            color: #16803c !important
-        }
+    .success {
+      color: #16803c !important
+    }
 
-        .tax-fields {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 8px
-        }
+    .tax-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px
+    }
 
-        .tax-field label {
-            display: block;
-            font-size: .86rem;
-            color: #334155;
-            margin-bottom: 3px
-        }
+    .tax-field label {
+      display: block;
+      font-size: .86rem;
+      color: #334155;
+      margin-bottom: 3px
+    }
 
-        .tax-field input {
-            width: 100%;
-            box-sizing: border-box
-        }
+    .tax-field input {
+      width: 100%;
+      box-sizing: border-box
+    }
 
-        .tax-results {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 10px;
-            margin-top: 12px
-        }
+    .tax-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px
+    }
 
-        .upgrade-box {
-            margin-top: 12px;
-            padding: 10px;
-            background: #f6f9fc;
-            border: 1px solid #d9e3ed;
-            border-radius: 6px
-        }
+    .upgrade-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #f6f9fc;
+      border: 1px solid #d9e3ed;
+      border-radius: 6px
+    }
 
-        .upgrade-box label {
-            font-weight: 600
-        }
+    .upgrade-box label {
+      font-weight: 600
+    }
 
-        .upgrade-message {
-            margin: 6px 0 0;
-            font-size: .86rem;
-            color: #5d6872
-        }
+    .upgrade-message {
+      margin: 6px 0 0;
+      font-size: .86rem;
+      color: #5d6872
+    }
 
-        @media(max-width:760px) {
-            table {
-                display: block;
-                overflow-x: auto
-            }
-        }
-    </style>
+    @media(max-width:760px) {
+      table {
+        display: block;
+        overflow-x: auto
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <h1>Window Promo Quote Calculator</h1>
-    <div class="card">
-        <div class="button-row"><button id="exportData" class="gray" type="button">Save quote data…</button><button
-                id="importData" class="gray" type="button">Import quote data</button><input id="importFile" type="file"
-                accept="application/json,.json" hidden><button id="importExcel" class="gray" type="button">Import Excel quote</button><input id="excelFile" type="file" accept=".xlsx,.xlsm" hidden></div>
-        <p id="excelStatus" class="hint" role="status"></p><p id="fileStatus" class="hint">Save quote data opens a Save As window in Microsoft Edge so you can choose the
-            name and location.</p>
+  <h1>Window Promo Quote Calculator</h1>
+  <div class="card">
+    <div class="button-row"><button id="exportData" class="gray"
+        type="button">Save quote data…</button><button id="importData"
+        class="gray" type="button">Import quote data</button><input
+        id="importFile" type="file" accept="application/json,.json"
+        hidden><button id="importExcel" class="gray" type="button">Import Excel
+        quote</button><input id="excelFile" type="file" accept=".xlsx,.xlsm"
+        hidden></div>
+    <p id="excelStatus" class="hint" role="status"></p>
+    <p id="fileStatus" class="hint">Save quote data opens a Save As window in
+      Microsoft Edge so you can choose the
+      name and location.</p>
+  </div>
+  <div class="card"><label>Surcharge (%): <input id="surcharge" type="number"
+        min="0" step="0.01" value="8"></label>
+  </div>
+  <div class="card">
+    <h2>Windows</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Seq</th>
+          <th>Qty</th>
+          <th>Line total (base)</th>
+          <th>Argon (row total)</th>
+          <th>Solar gain (row total)</th>
+          <th>Triple pane (row total)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p><button id="add" type="button">Add window</button></p>
+  </div>
+  <div class="card">
+    <div class="button-row"><label>Promo: <select id="promo">
+          <option value="none">No promo</option>
+          <option value="b2g2">Buy 2 get 2 at half price</option>
+          <option value="b3g3">Buy 3 get 3 at half price</option>
+          <option value="triple">Free triple pane</option>
+          <option value="argonSolar5">Free solar &amp; argon + 5% off</option>
+        </select></label><button id="calculate" type="button">Calculate
+        quote</button><button id="taxButton" class="green" type="button">Tax
+        calculation</button></div>
+    <p id="error" role="alert"></p>
+  </div>
+  <div class="card">
+    <h2>Promo &amp; totals</h2>
+    <div class="totals">
+      <div class="metric">Base windows<strong id="base">$0.00</strong></div>
+      <div class="metric">Argon + solar removed<strong
+          id="extras">$0.00</strong></div>
+      <div class="metric">Triple pane removed<strong
+          id="tripleRemoved">$0.00</strong></div>
+      <div class="metric">Surcharge (base price)<strong
+          id="surchargeTotal">$0.00</strong></div>
+      <div class="metric">Promo discount<strong id="discount">$0.00</strong>
+      </div>
+      <div class="metric">Final total<strong id="final">$0.00</strong></div>
     </div>
-    <div class="card"><label>Surcharge (%): <input id="surcharge" type="number" min="0" step="0.01" value="8"></label>
+    <p id="explanation" class="hint"></p>
+  </div>
+  <div class="card" id="taxCard" hidden>
+    <h2>Tax calculation</h2>
+    <div class="tax-fields">
+      <div class="tax-field"><label for="taxBase">1. Base price of
+          windows</label><input id="taxBase" type="number" min="0" step="0.01"
+          placeholder="Calculate quote first"></div>
+      <div class="tax-field"><label for="taxJC">2. J &amp; C</label><input
+          id="taxJC" type="number" min="0" step="0.01"
+          placeholder="Enter amount"></div>
+      <div class="tax-field"><label for="taxMisc">3. Miscellaneous</label><input
+          id="taxMisc" type="number" min="0" step="0.01"
+          placeholder="Enter amount"></div>
+      <div class="tax-field"><label for="taxLabour">4. Labour</label><input
+          id="taxLabour" type="number" min="0" step="0.01"
+          placeholder="Enter amount"></div>
+      <div class="tax-field"><label for="taxSurcharge">5.
+          Surcharge</label><input id="taxSurcharge" type="number" min="0"
+          step="0.01" placeholder="Calculate quote first"></div>
+      <div class="tax-field"><label for="taxDiscount">6. Discount (promo
+          discount)</label><input id="taxDiscount" type="number" min="0"
+          step="0.01" placeholder="Calculate quote first"></div>
     </div>
-    <div class="card">
-        <h2>Windows</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Seq</th>
-                    <th>Qty</th>
-                    <th>Line total (base)</th>
-                    <th>Argon (row total)</th>
-                    <th>Solar gain (row total)</th>
-                    <th>Triple pane (row total)</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-        </table>
-        <p><button id="add" type="button">Add window</button></p>
+    <p id="taxPromoNote" class="hint">Click Calculate quote to carry the
+      selected promo values into this section.
+      All carried values remain editable.</p>
+    <div class="upgrade-box"><label><input id="labourUpgrade" type="checkbox">
+        Show 5-year free labour upgrade
+        price</label>
+      <p id="upgradeMessage" class="upgrade-message">Optional. This shows the
+        upgrade price only; it is not
+        included in the HST or final total.</p>
     </div>
-    <div class="card">
-        <div class="button-row"><label>Promo: <select id="promo">
-                    <option value="none">No promo</option>
-                    <option value="b2g2">Buy 2 get 2 at half price</option>
-                    <option value="b3g3">Buy 3 get 3 at half price</option>
-                    <option value="triple">Free triple pane</option>
-                    <option value="argonSolar5">Free solar &amp; argon + 5% off</option>
-                </select></label><button id="calculate" type="button">Calculate quote</button><button id="taxButton"
-                class="green" type="button">Tax calculation</button></div>
-        <p id="error" role="alert"></p>
+    <p><button id="runTax" type="button">Calculate tax total</button></p>
+    <p id="taxError" role="alert"></p>
+    <div class="tax-results">
+      <div class="metric">Subtotal before discount<strong
+          id="taxSubtotal">$0.00</strong></div>
+      <div class="metric">After discount<strong
+          id="taxAfterDiscount">$0.00</strong></div>
+      <div class="metric">5-year labour upgrade price<strong
+          id="upgradeCharge">$0.00</strong></div>
+      <div class="metric">Upgrade rate<strong id="upgradeRate">—</strong></div>
+      <div class="metric">HST (13%)<strong id="taxHst">$0.00</strong></div>
+      <div class="metric">Total incl. HST<strong id="taxTotal">$0.00</strong>
+      </div>
+      <div class="metric">First 50% payment<strong
+          id="paymentOne">$0.00</strong></div>
+      <div class="metric">Final 50% payment<strong
+          id="paymentTwo">$0.00</strong></div>
     </div>
-    <div class="card">
-        <h2>Promo &amp; totals</h2>
-        <div class="totals">
-            <div class="metric">Base windows<strong id="base">$0.00</strong></div>
-            <div class="metric">Argon + solar removed<strong id="extras">$0.00</strong></div>
-            <div class="metric">Triple pane removed<strong id="tripleRemoved">$0.00</strong></div>
-            <div class="metric">Surcharge (base price)<strong id="surchargeTotal">$0.00</strong></div>
-            <div class="metric">Promo discount<strong id="discount">$0.00</strong></div>
-            <div class="metric">Final total<strong id="final">$0.00</strong></div>
-        </div>
-        <p id="explanation" class="hint"></p>
-    </div>
-    <div class="card" id="taxCard" hidden>
-        <h2>Tax calculation</h2>
-        <div class="tax-fields">
-            <div class="tax-field"><label for="taxBase">1. Base price of windows</label><input id="taxBase"
-                    type="number" min="0" step="0.01" placeholder="Calculate quote first"></div>
-            <div class="tax-field"><label for="taxJC">2. J &amp; C</label><input id="taxJC" type="number" min="0"
-                    step="0.01" placeholder="Enter amount"></div>
-            <div class="tax-field"><label for="taxMisc">3. Miscellaneous</label><input id="taxMisc" type="number"
-                    min="0" step="0.01" placeholder="Enter amount"></div>
-            <div class="tax-field"><label for="taxLabour">4. Labour</label><input id="taxLabour" type="number" min="0"
-                    step="0.01" placeholder="Enter amount"></div>
-            <div class="tax-field"><label for="taxSurcharge">5. Surcharge</label><input id="taxSurcharge" type="number"
-                    min="0" step="0.01" placeholder="Calculate quote first"></div>
-            <div class="tax-field"><label for="taxDiscount">6. Discount (promo discount)</label><input id="taxDiscount"
-                    type="number" min="0" step="0.01" placeholder="Calculate quote first"></div>
-        </div>
-        <p id="taxPromoNote" class="hint">Click Calculate quote to carry the selected promo values into this section.
-            All carried values remain editable.</p>
-        <div class="upgrade-box"><label><input id="labourUpgrade" type="checkbox"> Show 5-year free labour upgrade
-                price</label>
-            <p id="upgradeMessage" class="upgrade-message">Optional. This shows the upgrade price only; it is not
-                included in the HST or final total.</p>
-        </div>
-        <p><button id="runTax" type="button">Calculate tax total</button></p>
-        <p id="taxError" role="alert"></p>
-        <div class="tax-results">
-            <div class="metric">Subtotal before discount<strong id="taxSubtotal">$0.00</strong></div>
-            <div class="metric">After discount<strong id="taxAfterDiscount">$0.00</strong></div>
-            <div class="metric">5-year labour upgrade price<strong id="upgradeCharge">$0.00</strong></div>
-            <div class="metric">Upgrade rate<strong id="upgradeRate">—</strong></div>
-            <div class="metric">HST (13%)<strong id="taxHst">$0.00</strong></div>
-            <div class="metric">Total incl. HST<strong id="taxTotal">$0.00</strong></div>
-            <div class="metric">First 50% payment<strong id="paymentOne">$0.00</strong></div>
-            <div class="metric">Final 50% payment<strong id="paymentTwo">$0.00</strong></div>
-        </div>
-        <p id="taxExplanation" class="hint"></p>
-    </div>
-    <script>
-        'use strict';
-        const money = c => new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(c / 100); const cents = v => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : 0 }; const rows = document.getElementById('rows'); let lastQuote = null;
-        function setupComponentField(input) { input.dataset.total = input.value || '0'; input.addEventListener('focus', () => input.select()); input.addEventListener('keydown', event => { if (event.key !== '+' && event.code !== 'NumpadAdd') return; event.preventDefault(); const typed = Number(input.value); if (!Number.isFinite(typed) || typed < 0) { input.value = (Number(input.dataset.total || 0)).toFixed(2); input.select(); return } const total = Math.round((Number(input.dataset.total || 0) + typed) * 100) / 100; input.dataset.total = String(total); input.value = total.toFixed(2); input.select() }); input.addEventListener('change', () => { const typed = Number(input.value); if (!Number.isFinite(typed) || typed < 0) { input.value = ''; input.dataset.total = '0'; return } const total = Math.round(typed * 100) / 100; input.dataset.total = String(total); input.value = total.toFixed(2) }) }
-        function addRow(v = {}) { const r = document.createElement('tr'); r.innerHTML = `<td class="seq"></td><td><input class="qty" type="number" min="1" step="1" value="${v.qty ?? 1}"></td><td><input class="base" type="number" min="0" step="0.01" value="${v.base ?? ''}" placeholder="0.00"></td><td><input class="argon component" type="text" inputmode="decimal" value="${v.argon ?? ''}" placeholder="0.00"></td><td><input class="solar component" type="text" inputmode="decimal" value="${v.solar ?? ''}" placeholder="0.00"></td><td><input class="triple component" type="text" inputmode="decimal" value="${v.triple ?? ''}" placeholder="0.00"></td><td><button class="danger remove" type="button">Remove</button></td>`; r.querySelectorAll('.component').forEach(setupComponentField); r.querySelector('.remove').onclick = () => { r.remove(); renumber() }; rows.appendChild(r); renumber(); return r }
-        function renumber() { [...rows.querySelectorAll('tr')].forEach((r, i) => r.querySelector('.seq').textContent = i + 1) } function val(s, r) { const n = Number(r.querySelector(s).value); return Number.isFinite(n) && n >= 0 ? n : 0 } function units(a) { const o = []; a.forEach(x => { const one = x.base / x.qty; for (let i = 0; i < x.qty; i++)o.push(one) }); return o } function b2(p) { const s = [...p].sort((a, b) => a - b); let d = 0, l = 0, r = s.length - 1; while (r - l + 1 >= 4) { d += Math.round((s[l] + s[l + 1]) * 50) / 100; l += 2; r -= 2 } if (r - l + 1 === 3) d += Math.round(s[l] * 50) / 100; return Math.round(d) } function b3(p) { const s = [...p].sort((a, b) => a - b); let d = 0, l = 0, r = s.length - 1; while (r - l + 1 >= 6) { d += Math.round((s[l] + s[l + 1] + s[l + 2]) * 50) / 100; l += 3; r -= 3 } const rest = s.slice(l, r + 1); if (rest.length === 5) d += Math.round((rest[0] + rest[1]) * 50) / 100; else if (rest.length === 4) d += Math.round(rest[0] * 50) / 100; return Math.round(d) }
-        function fillTax(q) { document.getElementById('taxBase').value = (q.base / 100).toFixed(2); document.getElementById('taxSurcharge').value = (q.surcharge / 100).toFixed(2); document.getElementById('taxDiscount').value = (q.promoDiscount / 100).toFixed(2); document.getElementById('taxPromoNote').textContent = q.note }
-        function quote() { const e = document.getElementById('error'); e.textContent = ''; const rate = Number(document.getElementById('surcharge').value); if (!Number.isFinite(rate) || rate < 0) { e.textContent = 'Enter a valid surcharge percentage.'; return } const promo = document.getElementById('promo').value, items = [...rows.querySelectorAll('tr')].map(r => ({ qty: Math.max(1, Math.floor(val('.qty', r))), base: cents(val('.base', r)), argon: cents(val('.argon', r)), solar: cents(val('.solar', r)), triple: cents(val('.triple', r)) })); if (!items.length || items.some(x => x.base <= 0)) { e.textContent = 'Add at least one window with a base price greater than zero.'; return } const base = items.reduce((a, x) => a + x.base, 0), sur = Math.round(base * rate / 100); let extras = 0, triple = 0, promoDiscount = 0, text = 'No promotion applied.', note = 'No promo: base, surcharge, and $0.00 promo discount carried into Tax calculation.'; if (promo === 'argonSolar5') { extras = items.reduce((a, x) => a + x.argon + x.solar, 0); const five = Math.round(Math.max(0, base - extras) * .05); promoDiscount = extras + five; text = `Free argon/solar: ${money(extras)} removed; 5% off: ${money(five)}. Promo discount total: ${money(promoDiscount)}.`; note = `Argon/solar promo: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and full promo discount ${money(promoDiscount)} (argon + solar + 5%).` } else if (promo === 'triple') { triple = items.reduce((a, x) => a + x.triple, 0); promoDiscount = triple; text = `Free triple pane: ${money(triple)} removed.`; note = `Free triple pane: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and promo discount ${money(promoDiscount)}.` } else if (promo === 'b2g2' || promo === 'b3g3') { promoDiscount = promo === 'b2g2' ? b2(units(items)) : b3(units(items)); text = `${promo === 'b2g2' ? 'B2G2' : 'B3G3'} group discount: ${money(promoDiscount)}.`; note = `${promo === 'b2g2' ? 'B2G2' : 'B3G3'}: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and promo discount ${money(promoDiscount)}.` } const final = base - promoDiscount + sur; lastQuote = { base, surcharge: sur, promoDiscount, note }; fillTax(lastQuote); document.getElementById('base').textContent = money(base); document.getElementById('extras').textContent = money(extras); document.getElementById('tripleRemoved').textContent = money(triple); document.getElementById('surchargeTotal').textContent = money(sur); document.getElementById('discount').textContent = money(promoDiscount); document.getElementById('final').textContent = money(final); document.getElementById('explanation').textContent = `${text} Surcharge: ${money(sur)} on original base.` }
-        function upgradeFor(after) { if (after < 300000) return { charge: 0, rate: 'Not available below $3,000' }; if (after < 500000) return { charge: Math.max(Math.round(after * .06), 26000), rate: '6% (minimum $260)' }; if (after < 750000) return { charge: Math.round(after * .07), rate: '7%' }; if (after < 1000000) return { charge: Math.round(after * .08), rate: '8%' }; if (after < 1500000) return { charge: Math.round(after * .085), rate: '8.5%' }; if (after < 2000000) return { charge: Math.round(after * .09), rate: '9%' }; if (after < 2500000) return { charge: Math.round(after * .10), rate: '10%' }; return { charge: Math.round(after * .11), rate: '11%' } }
-        function tax() { const e = document.getElementById('taxError'); e.textContent = ''; const raw = Number(document.getElementById('taxBase').value); if (!Number.isFinite(raw) || raw < 0) { e.textContent = 'Enter a valid base price of windows.'; return } const get = id => cents(document.getElementById(id).value), base = cents(raw), jc = get('taxJC'), misc = get('taxMisc'), labour = get('taxLabour'), sur = get('taxSurcharge'), disc = get('taxDiscount'), before = base + jc + misc + labour + sur, after = Math.max(0, before - disc), wants = document.getElementById('labourUpgrade').checked, upgrade = upgradeFor(after), shown = wants ? upgrade.charge : 0, hst = Math.round(after * .13), total = after + hst, first = Math.floor(total / 2), second = total - first; document.getElementById('taxSubtotal').textContent = money(before); document.getElementById('taxAfterDiscount').textContent = money(after); document.getElementById('upgradeCharge').textContent = money(shown); document.getElementById('upgradeRate').textContent = wants ? upgrade.rate : 'Not selected'; document.getElementById('taxHst').textContent = money(hst); document.getElementById('taxTotal').textContent = money(total); document.getElementById('paymentOne').textContent = money(first); document.getElementById('paymentTwo').textContent = money(second); const msg = wants && after < 300000 ? 'Upgrade not available below $3,000.' : wants ? `5-year labour upgrade price: ${money(shown)} at ${upgrade.rate}. This price is not included in HST or the total.` : '5-year labour upgrade not selected.'; document.getElementById('upgradeMessage').textContent = msg; document.getElementById('taxExplanation').textContent = `${money(before)} − ${money(disc)} promo discount = ${money(after)}. ${msg} HST: ${money(hst)}. Payment split: ${money(first)} + ${money(second)}.` }
-        function quoteData() { return { app: 'Window Promo Quote Calculator', version: 15, savedAt: new Date().toISOString(), surcharge: document.getElementById('surcharge').value, promo: document.getElementById('promo').value, windows: [...rows.querySelectorAll('tr')].map(r => ({ qty: r.querySelector('.qty').value, base: r.querySelector('.base').value, argon: r.querySelector('.argon').value, solar: r.querySelector('.solar').value, triple: r.querySelector('.triple').value })), tax: { base: document.getElementById('taxBase').value, jc: document.getElementById('taxJC').value, misc: document.getElementById('taxMisc').value, labour: document.getElementById('taxLabour').value, surcharge: document.getElementById('taxSurcharge').value, discount: document.getElementById('taxDiscount').value, labourUpgrade: document.getElementById('labourUpgrade').checked, taxOpen: !document.getElementById('taxCard').hidden } } }
-        async function saveData() { const status = document.getElementById('fileStatus'); const content = JSON.stringify(quoteData(), null, 2); const filename = `window-quote-${new Date().toISOString().slice(0, 10)}.json`; try { if (!window.showSaveFilePicker) throw new Error('Save As is not supported in this browser or context.'); const handle = await window.showSaveFilePicker({ suggestedName: filename, types: [{ description: 'Window quote data', accept: { 'application/json': ['.json'] } }] }); const writable = await handle.createWritable(); await writable.write(content); await writable.close(); status.textContent = 'Quote data saved successfully.'; status.className = 'hint success' } catch (err) { if (err && err.name === 'AbortError') { status.textContent = 'Save cancelled.'; status.className = 'hint'; return } status.textContent = `Save As could not open: ${err.message} Open this HTML file in Microsoft Edge (not a preview) and try again.`; status.className = 'hint' } }
-        function importData(file) { const status = document.getElementById('fileStatus'), reader = new FileReader(); reader.onload = () => { try { const d = JSON.parse(reader.result); if (!Array.isArray(d.windows)) throw new Error('This is not a valid quote data file.'); document.getElementById('surcharge').value = d.surcharge ?? 8; document.getElementById('promo').value = d.promo ?? 'none'; rows.innerHTML = ''; d.windows.forEach(w => addRow(w)); if (!d.windows.length) addRow(); const t = d.tax || {}; document.getElementById('taxBase').value = t.base ?? ''; document.getElementById('taxJC').value = t.jc ?? ''; document.getElementById('taxMisc').value = t.misc ?? ''; document.getElementById('taxLabour').value = t.labour ?? ''; document.getElementById('taxSurcharge').value = t.surcharge ?? ''; document.getElementById('taxDiscount').value = t.discount ?? ''; document.getElementById('labourUpgrade').checked = !!t.labourUpgrade; document.getElementById('taxCard').hidden = !t.taxOpen; lastQuote = null; status.textContent = 'Quote data imported. Review values and click Calculate quote, then Calculate tax total.'; status.className = 'hint success' } catch (err) { status.textContent = `Import failed: ${err.message}`; status.className = 'hint' } }; reader.onerror = () => { status.textContent = 'Import failed: unable to read the selected file.'; status.className = 'hint' }; reader.readAsText(file) }
-        document.getElementById('add').onclick = () => addRow(); document.getElementById('calculate').onclick = quote; document.getElementById('taxButton').onclick = () => { const c = document.getElementById('taxCard'); c.hidden = !c.hidden; if (!c.hidden) { if (lastQuote) fillTax(lastQuote); c.scrollIntoView({ behavior: 'smooth', block: 'start' }) } }; document.getElementById('runTax').onclick = tax; document.getElementById('exportData').onclick = saveData; document.getElementById('importData').onclick = () => document.getElementById('importFile').click(); document.getElementById('importFile').onchange = e => { const f = e.target.files && e.target.files[0]; if (f) importData(f); e.target.value = '' }; addRow();
+    <p id="taxExplanation" class="hint"></p>
+  </div>
+  <script>
+    'use strict';
+    const money = c => new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: 'CAD'
+    }).format(c / 100);
+    const cents = v => {
+      const n = Number(v);
+      return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : 0
+    };
+    const rows = document.getElementById('rows');
+    let lastQuote = null;
 
-        // --- Enter-key field navigation (added feature; does not modify any existing function above) ---
-        const ENTER_SEQUENCE = ['.base', '.argon', '.solar', '.triple'];
-        function focusBase(row) { const f = row && row.querySelector('.base'); if (f) { f.focus(); f.select() } }
-        function tryAddRowFromRow(row) {
-            const baseInput = row ? row.querySelector('.base') : null;
-            if (!baseInput || baseInput.value.trim() === '') { focusBase(row); return }
-            focusBase(addRow());
+    function setupComponentField(input) {
+      input.dataset.total = input.value || '0';
+      input.addEventListener('focus', () => input.select());
+      input.addEventListener('keydown', event => {
+        if (event.key !== '+' && event.code !== 'NumpadAdd') return;
+        event.preventDefault();
+        const typed = Number(input.value);
+        if (!Number.isFinite(typed) || typed < 0) {
+          input.value = (Number(input.dataset.total || 0)).toFixed(2);
+          input.select();
+          return
         }
-        rows.addEventListener('keydown', event => {
-            if (event.key !== 'Enter') return;
-            const row = event.target.closest('tr');
-            if (!row) return;
-            const field = ENTER_SEQUENCE.find(sel => event.target.matches(sel));
-            if (!field) return;
-            event.preventDefault();
-            if (event.shiftKey) { tryAddRowFromRow(row); return }
-            const idx = ENTER_SEQUENCE.indexOf(field);
-            if (idx < ENTER_SEQUENCE.length - 1) {
-                const next = row.querySelector(ENTER_SEQUENCE[idx + 1]);
-                if (next) { next.focus(); next.select() }
-                return;
-            }
-            const nextRow = row.nextElementSibling;
-            if (nextRow) focusBase(nextRow);
-            else document.getElementById('add').focus();
-        });
-        document.getElementById('add').addEventListener('keydown', event => {
-            if (event.key !== 'Enter') return;
-            event.preventDefault();
-            const lastRow = rows.lastElementChild;
-            tryAddRowFromRow(lastRow);
-        });
+        const total = Math.round((Number(input.dataset.total || 0) +
+          typed) * 100) / 100;
+        input.dataset.total = String(total);
+        input.value = total.toFixed(2);
+        input.select()
+      });
+      input.addEventListener('change', () => {
+        const typed = Number(input.value);
+        if (!Number.isFinite(typed) || typed < 0) {
+          input.value = '';
+          input.dataset.total = '0';
+          return
+        }
+        const total = Math.round(typed * 100) / 100;
+        input.dataset.total = String(total);
+        input.value = total.toFixed(2)
+      })
+    }
 
-        // Excel import: reads manufacturer quote layout; existing pricing functions remain unchanged.
-        function parseManufacturerQuote(sheetRows) {
-            const sheet = sheetRows;
-            const str = v => String(v ?? '').trim();
-            const num = v => typeof v === 'number' && Number.isFinite(v) ? v : (str(v) && /^-?\d+(?:\.\d+)?$/.test(str(v).replace(/[$,]/g, '')) ? Number(str(v).replace(/[$,]/g, '')) : null);
-            const integer = v => /^(?:[1-9]\d*)(?:\.0)?$/.test(str(v));
-            const parentStarts = [];
-            for (let i = 0; i < sheet.length; i++) if (integer(sheet[i][2]) && str(sheet[i][9]) && num(sheet[i][28]) !== null) parentStarts.push(i);
-            const imported = [];
-            for (let pi = 0; pi < parentStarts.length; pi++) {
-                const start = parentStarts[pi], end = parentStarts[pi + 1] ?? sheet.length;
-                const id = String(Math.trunc(num(sheet[start][2])));
-                const children = [];
-                for (let r = start + 1; r < end; r++) {
-                    const line = str(sheet[r][2]);
-                    if (new RegExp('^' + id + '\\.\\d+$').test(line) && str(sheet[r][9])) children.push(r);
-                }
-                let total = null;
-                for (let r = start + 1; r < end - 1; r++) {
-                    if (sheet[r].some(v => str(v).toUpperCase() === 'LINE ITEM TOTAL:')) {
-                        total = num(sheet[r + 1][41]); // AP: list-price line total, next row
-                        break;
-                    }
-                }
-                if (total === null || total <= 0) throw new Error('Missing parent list LINE ITEM TOTAL for group ' + id + '. Nothing imported.');
-                const option = (from, to, name) => {
-                    let amount = 0;
-                    for (let r = from + 1; r < to; r++) {
-                        if (str(sheet[r][7]).toUpperCase() !== name) continue;
-                        // In this export the amount is directly ABOVE the option label, AR (index 43).
-                        const price = num(sheet[r - 1]?.[43]);
-                        if (price === null) throw new Error('Missing ' + name + ' list price near sheet row ' + (r + 1) + '. Nothing imported.');
-                        amount += Math.round(price * 100);
-                    }
-                    return amount;
-                };
-                const sections = children.length ? children.map((r, j) => [r, children[j + 1] ?? end]) : [[start, end]];
-                const totalOption = name => sections.reduce((sum, section) => sum + option(section[0], section[1], name), 0);
-                imported.push({ id, qty: num(sheet[start][28]), base: total,
-                    argon: totalOption('ARGON') / 100,
-                    solar: totalOption('SOLAR GAIN') / 100,
-                    triple: (totalOption('TRIPLE GLAZED') + totalOption('TRIPLE PANE')) / 100 });
-            }
-            if (!imported.length) throw new Error('No numbered window items found. Nothing imported.');
-            return imported;
+    function addRow(v = {}) {
+      const r = document.createElement('tr');
+      r.innerHTML =
+        `<td class="seq"></td><td><input class="qty" type="number" min="1" step="1" value="${v.qty ?? 1}"></td><td><input class="base" type="number" min="0" step="0.01" value="${v.base ?? ''}" placeholder="0.00"></td><td><input class="argon component" type="text" inputmode="decimal" value="${v.argon ?? ''}" placeholder="0.00"></td><td><input class="solar component" type="text" inputmode="decimal" value="${v.solar ?? ''}" placeholder="0.00"></td><td><input class="triple component" type="text" inputmode="decimal" value="${v.triple ?? ''}" placeholder="0.00"></td><td><button class="danger remove" type="button">Remove</button></td>`;
+      r.querySelectorAll('.component').forEach(setupComponentField);
+      r.querySelector('.remove').onclick = () => {
+        r.remove();
+        renumber()
+      };
+      rows.appendChild(r);
+      renumber();
+      return r
+    }
+
+    function renumber() {
+      [...rows.querySelectorAll('tr')].forEach((r, i) => r.querySelector('.seq')
+        .textContent = i + 1)
+    }
+
+    function val(s, r) {
+      const n = Number(r.querySelector(s).value);
+      return Number.isFinite(n) && n >= 0 ? n : 0
+    }
+
+    function units(a) {
+      const o = [];
+      a.forEach(x => {
+        const one = x.base / x.qty;
+        for (let i = 0; i < x.qty; i++) o.push(one)
+      });
+      return o
+    }
+
+    function b2(p) {
+      const s = [...p].sort((a, b) => a - b);
+      let d = 0,
+        l = 0,
+        r = s.length - 1;
+      while (r - l + 1 >= 4) {
+        d += Math.round((s[l] + s[l + 1]) * 50) / 100;
+        l += 2;
+        r -= 2
+      }
+      if (r - l + 1 === 3) d += Math.round(s[l] * 50) / 100;
+      return Math.round(d)
+    }
+
+    function b3(p) {
+      const s = [...p].sort((a, b) => a - b);
+      let d = 0,
+        l = 0,
+        r = s.length - 1;
+      while (r - l + 1 >= 6) {
+        d += Math.round((s[l] + s[l + 1] + s[l + 2]) * 50) / 100;
+        l += 3;
+        r -= 3
+      }
+      const rest = s.slice(l, r + 1);
+      if (rest.length === 5) d += Math.round((rest[0] + rest[1]) * 50) / 100;
+      else if (rest.length === 4) d += Math.round(rest[0] * 50) / 100;
+      return Math.round(d)
+    }
+
+    function fillTax(q) {
+      document.getElementById('taxBase').value = (q.base / 100).toFixed(2);
+      document.getElementById('taxSurcharge').value = (q.surcharge / 100)
+        .toFixed(2);
+      document.getElementById('taxDiscount').value = (q.promoDiscount / 100)
+        .toFixed(2);
+      document.getElementById('taxPromoNote').textContent = q.note
+    }
+
+    function quote() {
+      const e = document.getElementById('error');
+      e.textContent = '';
+      const rate = Number(document.getElementById('surcharge').value);
+      if (!Number.isFinite(rate) || rate < 0) {
+        e.textContent = 'Enter a valid surcharge percentage.';
+        return
+      }
+      const promo = document.getElementById('promo').value,
+        items = [...rows.querySelectorAll('tr')].map(r => ({
+          qty: Math.max(1, Math.floor(val('.qty', r))),
+          base: cents(val('.base', r)),
+          argon: cents(val('.argon', r)),
+          solar: cents(val('.solar', r)),
+          triple: cents(val('.triple', r))
+        }));
+      if (!items.length || items.some(x => x.base <= 0)) {
+        e.textContent =
+          'Add at least one window with a base price greater than zero.';
+        return
+      }
+      const base = items.reduce((a, x) => a + x.base, 0),
+        sur = Math.round(base * rate / 100);
+      let extras = 0,
+        triple = 0,
+        promoDiscount = 0,
+        text = 'No promotion applied.',
+        note =
+        'No promo: base, surcharge, and $0.00 promo discount carried into Tax calculation.';
+      if (promo === 'argonSolar5') {
+        extras = items.reduce((a, x) => a + x.argon + x.solar, 0);
+        const five = Math.round(Math.max(0, base - extras) * .05);
+        promoDiscount = extras + five;
+        text =
+          `Free argon/solar: ${money(extras)} removed; 5% off: ${money(five)}. Promo discount total: ${money(promoDiscount)}.`;
+        note =
+          `Argon/solar promo: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and full promo discount ${money(promoDiscount)} (argon + solar + 5%).`
+      } else if (promo === 'triple') {
+        triple = items.reduce((a, x) => a + x.triple, 0);
+        promoDiscount = triple;
+        text = `Free triple pane: ${money(triple)} removed.`;
+        note =
+          `Free triple pane: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and promo discount ${money(promoDiscount)}.`
+      } else if (promo === 'b2g2' || promo === 'b3g3') {
+        promoDiscount = promo === 'b2g2' ? b2(units(items)) : b3(units(items));
+        text =
+          `${promo === 'b2g2' ? 'B2G2' : 'B3G3'} group discount: ${money(promoDiscount)}.`;
+        note =
+          `${promo === 'b2g2' ? 'B2G2' : 'B3G3'}: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and promo discount ${money(promoDiscount)}.`
+      }
+      const final = base - promoDiscount + sur;
+      lastQuote = {
+        base,
+        surcharge: sur,
+        promoDiscount,
+        note
+      };
+      fillTax(lastQuote);
+      document.getElementById('base').textContent = money(base);
+      document.getElementById('extras').textContent = money(extras);
+      document.getElementById('tripleRemoved').textContent = money(triple);
+      document.getElementById('surchargeTotal').textContent = money(sur);
+      document.getElementById('discount').textContent = money(promoDiscount);
+      document.getElementById('final').textContent = money(final);
+      document.getElementById('explanation').textContent =
+        `${text} Surcharge: ${money(sur)} on original base.`
+    }
+
+    function upgradeFor(after) {
+      if (after < 300000) return {
+        charge: 0,
+        rate: 'Not available below $3,000'
+      };
+      if (after < 500000) return {
+        charge: Math.max(Math.round(after * .06), 26000),
+        rate: '6% (minimum $260)'
+      };
+      if (after < 750000) return {
+        charge: Math.round(after * .07),
+        rate: '7%'
+      };
+      if (after < 1000000) return {
+        charge: Math.round(after * .08),
+        rate: '8%'
+      };
+      if (after < 1500000) return {
+        charge: Math.round(after * .085),
+        rate: '8.5%'
+      };
+      if (after < 2000000) return {
+        charge: Math.round(after * .09),
+        rate: '9%'
+      };
+      if (after < 2500000) return {
+        charge: Math.round(after * .10),
+        rate: '10%'
+      };
+      return {
+        charge: Math.round(after * .11),
+        rate: '11%'
+      }
+    }
+
+    function tax() {
+      const e = document.getElementById('taxError');
+      e.textContent = '';
+      const raw = Number(document.getElementById('taxBase').value);
+      if (!Number.isFinite(raw) || raw < 0) {
+        e.textContent = 'Enter a valid base price of windows.';
+        return
+      }
+      const get = id => cents(document.getElementById(id).value),
+        base = cents(raw),
+        jc = get('taxJC'),
+        misc = get('taxMisc'),
+        labour = get('taxLabour'),
+        sur = get('taxSurcharge'),
+        disc = get('taxDiscount'),
+        before = base + jc + misc + labour + sur,
+        after = Math.max(0, before - disc),
+        wants = document.getElementById('labourUpgrade').checked,
+        upgrade = upgradeFor(after),
+        shown = wants ? upgrade.charge : 0,
+        hst = Math.round(after * .13),
+        total = after + hst,
+        first = Math.floor(total / 2),
+        second = total - first;
+      document.getElementById('taxSubtotal').textContent = money(before);
+      document.getElementById('taxAfterDiscount').textContent = money(after);
+      document.getElementById('upgradeCharge').textContent = money(shown);
+      document.getElementById('upgradeRate').textContent = wants ? upgrade
+        .rate : 'Not selected';
+      document.getElementById('taxHst').textContent = money(hst);
+      document.getElementById('taxTotal').textContent = money(total);
+      document.getElementById('paymentOne').textContent = money(first);
+      document.getElementById('paymentTwo').textContent = money(second);
+      const msg = wants && after < 300000 ?
+        'Upgrade not available below $3,000.' : wants ?
+        `5-year labour upgrade price: ${money(shown)} at ${upgrade.rate}. This price is not included in HST or the total.` :
+        '5-year labour upgrade not selected.';
+      document.getElementById('upgradeMessage').textContent = msg;
+      document.getElementById('taxExplanation').textContent =
+        `${money(before)} − ${money(disc)} promo discount = ${money(after)}. ${msg} HST: ${money(hst)}. Payment split: ${money(first)} + ${money(second)}.`
+    }
+
+    function quoteData() {
+      return {
+        app: 'Window Promo Quote Calculator',
+        version: 15,
+        savedAt: new Date().toISOString(),
+        surcharge: document.getElementById('surcharge').value,
+        promo: document.getElementById('promo').value,
+        windows: [...rows.querySelectorAll('tr')].map(r => ({
+          qty: r.querySelector('.qty').value,
+          base: r.querySelector('.base').value,
+          argon: r.querySelector('.argon').value,
+          solar: r.querySelector('.solar').value,
+          triple: r.querySelector('.triple').value
+        })),
+        tax: {
+          base: document.getElementById('taxBase').value,
+          jc: document.getElementById('taxJC').value,
+          misc: document.getElementById('taxMisc').value,
+          labour: document.getElementById('taxLabour').value,
+          surcharge: document.getElementById('taxSurcharge').value,
+          discount: document.getElementById('taxDiscount').value,
+          labourUpgrade: document.getElementById('labourUpgrade').checked,
+          taxOpen: !document.getElementById('taxCard').hidden
         }
-        document.getElementById('importExcel').onclick = () => document.getElementById('excelFile').click();
-        document.getElementById('excelFile').onchange = async event => {
-            const file = event.target.files?.[0], status = document.getElementById('excelStatus');
-            event.target.value = '';
-            if (!file) return;
-            try {
-                if (!window.XLSX) throw new Error('Excel reader did not load. Connect to the internet, then reopen the application.');
-                const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-                const name = workbook.SheetNames.includes('Order') ? 'Order' : workbook.SheetNames[0];
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1, defval: '', raw: true });
-                const imported = parseManufacturerQuote(data);
-                // No partial imports: validate every group before replacing the existing rows.
-                rows.innerHTML = '';
-                imported.forEach(item => addRow(item));
-                lastQuote = null;
-                status.textContent = `Imported ${imported.length} window(s) from ${file.name}. Review amounts, then click Calculate quote.`;
-                status.className = 'hint success';
-            } catch (error) {
-                status.textContent = 'Excel import failed: ' + error.message;
-                status.className = 'hint';
+      }
+    }
+    async function saveData() {
+      const status = document.getElementById('fileStatus');
+      const content = JSON.stringify(quoteData(), null, 2);
+      const filename =
+        `window-quote-${new Date().toISOString().slice(0, 10)}.json`;
+      try {
+        if (!window.showSaveFilePicker) throw new Error(
+          'Save As is not supported in this browser or context.');
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{
+            description: 'Window quote data',
+            accept: {
+              'application/json': ['.json']
             }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(content);
+        await writable.close();
+        status.textContent = 'Quote data saved successfully.';
+        status.className = 'hint success'
+      } catch (err) {
+        if (err && err.name === 'AbortError') {
+          status.textContent = 'Save cancelled.';
+          status.className = 'hint';
+          return
+        }
+        status.textContent =
+          `Save As could not open: ${err.message} Open this HTML file in Microsoft Edge (not a preview) and try again.`;
+        status.className = 'hint'
+      }
+    }
+
+    function importData(file) {
+      const status = document.getElementById('fileStatus'),
+        reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const d = JSON.parse(reader.result);
+          if (!Array.isArray(d.windows)) throw new Error(
+            'This is not a valid quote data file.');
+          document.getElementById('surcharge').value = d.surcharge ?? 8;
+          document.getElementById('promo').value = d.promo ?? 'none';
+          rows.innerHTML = '';
+          d.windows.forEach(w => addRow(w));
+          if (!d.windows.length) addRow();
+          const t = d.tax || {};
+          document.getElementById('taxBase').value = t.base ?? '';
+          document.getElementById('taxJC').value = t.jc ?? '';
+          document.getElementById('taxMisc').value = t.misc ?? '';
+          document.getElementById('taxLabour').value = t.labour ?? '';
+          document.getElementById('taxSurcharge').value = t.surcharge ?? '';
+          document.getElementById('taxDiscount').value = t.discount ?? '';
+          document.getElementById('labourUpgrade').checked = !!t
+          .labourUpgrade;
+          document.getElementById('taxCard').hidden = !t.taxOpen;
+          lastQuote = null;
+          status.textContent =
+            'Quote data imported. Review values and click Calculate quote, then Calculate tax total.';
+          status.className = 'hint success'
+        } catch (err) {
+          status.textContent = `Import failed: ${err.message}`;
+          status.className = 'hint'
+        }
+      };
+      reader.onerror = () => {
+        status.textContent =
+          'Import failed: unable to read the selected file.';
+        status.className = 'hint'
+      };
+      reader.readAsText(file)
+    }
+    document.getElementById('add').onclick = () => addRow();
+    document.getElementById('calculate').onclick = quote;
+    document.getElementById('taxButton').onclick = () => {
+      const c = document.getElementById('taxCard');
+      c.hidden = !c.hidden;
+      if (!c.hidden) {
+        if (lastQuote) fillTax(lastQuote);
+        c.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }
+    };
+    document.getElementById('runTax').onclick = tax;
+    document.getElementById('exportData').onclick = saveData;
+    document.getElementById('importData').onclick = () => document
+      .getElementById('importFile').click();
+    document.getElementById('importFile').onchange = e => {
+      const f = e.target.files && e.target.files[0];
+      if (f) importData(f);
+      e.target.value = ''
+    };
+    addRow();
+
+    // --- Enter-key field navigation (added feature; does not modify any existing function above) ---
+    const ENTER_SEQUENCE = ['.base', '.argon', '.solar', '.triple'];
+
+    function focusBase(row) {
+      const f = row && row.querySelector('.base');
+      if (f) {
+        f.focus();
+        f.select()
+      }
+    }
+
+    function tryAddRowFromRow(row) {
+      const baseInput = row ? row.querySelector('.base') : null;
+      if (!baseInput || baseInput.value.trim() === '') {
+        focusBase(row);
+        return
+      }
+      focusBase(addRow());
+    }
+    rows.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      const row = event.target.closest('tr');
+      if (!row) return;
+      const field = ENTER_SEQUENCE.find(sel => event.target.matches(sel));
+      if (!field) return;
+      event.preventDefault();
+      if (event.shiftKey) {
+        tryAddRowFromRow(row);
+        return
+      }
+      const idx = ENTER_SEQUENCE.indexOf(field);
+      if (idx < ENTER_SEQUENCE.length - 1) {
+        const next = row.querySelector(ENTER_SEQUENCE[idx + 1]);
+        if (next) {
+          next.focus();
+          next.select()
+        }
+        return;
+      }
+      const nextRow = row.nextElementSibling;
+      if (nextRow) focusBase(nextRow);
+      else document.getElementById('add').focus();
+    });
+    document.getElementById('add').addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      const lastRow = rows.lastElementChild;
+      tryAddRowFromRow(lastRow);
+    });
+
+    // Excel import: reads manufacturer quote layout; existing pricing functions remain unchanged.
+    function parseManufacturerQuote(sheetRows) {
+      const sheet = sheetRows;
+      const str = v => String(v ?? '').trim();
+      const num = v => typeof v === 'number' && Number.isFinite(v) ? v : (str(
+        v) && /^-?\d+(?:\.\d+)?$/.test(str(v).replace(/[$,]/g, '')) ? Number(
+          str(v).replace(/[$,]/g, '')) : null);
+      const integer = v => /^(?:[1-9]\d*)(?:\.0)?$/.test(str(v));
+      const parentStarts = [];
+      for (let i = 0; i < sheet.length; i++)
+        if (integer(sheet[i][2]) && str(sheet[i][9]) && num(sheet[i][28]) !==
+          null) parentStarts.push(i);
+      const imported = [];
+      for (let pi = 0; pi < parentStarts.length; pi++) {
+        const start = parentStarts[pi],
+          end = parentStarts[pi + 1] ?? sheet.length;
+        const id = String(Math.trunc(num(sheet[start][2])));
+        const children = [];
+        for (let r = start + 1; r < end; r++) {
+          const line = str(sheet[r][2]);
+          if (new RegExp('^' + id + '\\.\\d+$').test(line) && str(sheet[r][9]))
+            children.push(r);
+        }
+        let total = null;
+        for (let r = start + 1; r < end - 1; r++) {
+          if (sheet[r].some(v => str(v).toUpperCase() === 'LINE ITEM TOTAL:')) {
+            total = num(sheet[r + 1][
+            41]); // AP: list-price line total, next row
+            break;
+          }
+        }
+        if (total === null || total <= 0) throw new Error(
+          'Missing parent list LINE ITEM TOTAL for group ' + id +
+          '. Nothing imported.');
+        const option = (from, to, name) => {
+          let amount = 0;
+          for (let r = from + 1; r < to; r++) {
+            if (str(sheet[r][7]).toUpperCase() !== name) continue;
+            // In this export the amount is directly ABOVE the option label, AR (index 43).
+            const price = num(sheet[r - 1]?.[43]);
+            if (price === null) throw new Error('Missing ' + name +
+              ' list price near sheet row ' + (r + 1) +
+              '. Nothing imported.');
+            amount += Math.round(price * 100);
+          }
+          return amount;
         };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        const sections = children.length ? children.map((r, j) => [r, children[
+          j + 1] ?? end]) : [
+          [start, end]
+        ];
+        const totalOption = name => sections.reduce((sum, section) => sum +
+          option(section[0], section[1], name), 0);
+        imported.push({
+          id,
+          qty: num(sheet[start][28]),
+          base: total,
+          argon: totalOption('ARGON') / 100,
+          solar: totalOption('SOLAR GAIN') / 100,
+          triple: (totalOption('TRIPLE GLAZED') + totalOption(
+            'TRIPLE PANE')) / 100
+        });
+      }
+      if (!imported.length) throw new Error(
+        'No numbered window items found. Nothing imported.');
+      return imported;
+    }
+    document.getElementById('importExcel').onclick = () => document
+      .getElementById('excelFile').click();
+    document.getElementById('excelFile').onchange = async event => {
+      const file = event.target.files?.[0],
+        status = document.getElementById('excelStatus');
+      event.target.value = '';
+      if (!file) return;
+      try {
+        if (!window.XLSX) throw new Error(
+          'Excel reader did not load. Connect to the internet, then reopen the application.'
+          );
+        const workbook = XLSX.read(await file.arrayBuffer(), {
+          type: 'array'
+        });
+        const name = workbook.SheetNames.includes('Order') ? 'Order' :
+          workbook.SheetNames[0];
+        const data = XLSX.utils.sheet_to_json(workbook.Sheets[name], {
+          header: 1,
+          defval: '',
+          raw: true
+        });
+        const imported = parseManufacturerQuote(data);
+        // No partial imports: validate every group before replacing the existing rows.
+        rows.innerHTML = '';
+        imported.forEach(item => addRow(item));
+        lastQuote = null;
+        status.textContent =
+          `Imported ${imported.length} window(s) from ${file.name}. Review amounts, then click Calculate quote.`;
+        status.className = 'hint success';
+      } catch (error) {
+        status.textContent = 'Excel import failed: ' + error.message;
+        status.className = 'hint';
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+  </script>
 </body>
 
 </html>
-
