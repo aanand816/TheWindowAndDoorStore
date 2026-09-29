@@ -189,11 +189,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 6px 8px;
   text-decoration: none;
   border-radius: 4px;
   background: #52616b;
   color: WHITE;
+  font-size: .9rem
 }
     
 
@@ -208,17 +209,23 @@
 
 <body>
   <h1>Window Promo Quote Calculator</h1>
-  <div class="card">
-    <div class="button-row"><button id="exportData" class="gray"
-        type="button">Save quote data…</button><button id="importData"
-        class="gray" type="button">Import quote data</button><input
-        id="importFile" type="file" accept="application/json,.json"
-        hidden><button id="importExcel" class="gray" type="button">Import Excel
-        quote</button><input id="excelFile" type="file" accept=".xlsx,.xlsm"
-        hidden>
-      <a class="gray tool-link" href="Window_Quote_PDF_Editor.html">PDF editor</a>
-      <a class="gray tool-link" href="Label_Generator.html">Label generator</a>
-    </div>
+<div class="card">
+  <div class="button-row">
+    <button id="importExcel" class="gray" type="button">
+      Import Excel quote
+    </button>
+    <input id="excelFile" type="file" accept=".xlsx,.xlsm" hidden>
+
+    <a class="gray tool-link" href="Window_Quote_PDF_Editor.html">
+      PDF editor
+    </a>
+    <a class="gray tool-link" href="Label_Generator.html">
+      Label generator
+    </a>
+  </div>
+  <p id="excelStatus" class="hint" role="status"></p>
+</div>
+  
     <p id="excelStatus" class="hint" role="status"></p>
     <p id="fileStatus" class="hint">Save quote data opens a Save As window in
       Microsoft Edge so you can choose the
@@ -708,15 +715,6 @@
           block: 'start'
         })
       }
-    };
-    document.getElementById('runTax').onclick = tax;
-    document.getElementById('exportData').onclick = saveData;
-    document.getElementById('importData').onclick = () => document
-      .getElementById('importFile').click();
-    document.getElementById('importFile').onchange = e => {
-      const f = e.target.files && e.target.files[0];
-      if (f) importData(f);
-      e.target.value = ''
     };
     addRow();
 
