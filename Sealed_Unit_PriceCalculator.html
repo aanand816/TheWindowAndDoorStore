@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sealed Unit Price Calculator — The Window & Door Store</title>
+<meta name="description" content="Calculate sealed unit glass pricing with automatic thickness selection, argon surcharge, and multi-item quote builder.">
+<link rel="stylesheet" href="studio.css">
+<style>
+  /* Page-specific: keep wrap full-width inside content */
+  .wrap { max-width: none; margin: 0; }
+</style>
+</head>
+<body>
+  <!-- Mobile sidebar toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">W</div>
+        <div>
+          <strong>Window &amp; Door</strong>
+          <span>Store Tools</span>
+        </div>
+      </div>
+      <p class="nav-label">Tools</p>
+      <nav class="nav-list">
+        <a class="nav" href="index.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h2M12 12h2M16 12h2M8 16h2M12 16h2M16 16h2"/></svg>
+          Promo Calculator
+        </a>
+        <a class="nav" href="Window_Quote_PDF_Editor.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg>
+          Quote PDF Editor
+        </a>
+        <a class="nav" href="Label_Generator.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v6l9 9 8-8-9-9z"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>
+          Order Labels
+        </a>
+        <a class="nav active" href="Sealed_Unit_PriceCalculator.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/></svg>
+          Sealed Units
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main workspace -->
+    <div class="workspace">
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="breadcrumb">
+          <a href="index.html">Tools</a>
+          <span class="sep">/</span>
+          <span class="current">Sealed Units</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="avatar" aria-label="User">WD</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Page heading -->
+        <div class="page-head">
+          <div>
+            <h1>Sealed Unit Price Calculator</h1>
+            <p class="subtitle">Calculate sealed unit glass pricing with automatic thickness selection and multi-item quote builder.</p>
+          </div>
+        </div>
+
+<div class="wrap">
+
+  <!-- New Line Item -->
+  <div class="card">
+    <div class="card-header">
+      <h2>New Line Item</h2>
+    </div>
+    <div class="form-grid" style="grid-template-columns: 2fr 1fr 2fr 100px; align-items: end; gap: 16px;">
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" for="combination">Sealed Unit Combination</label>
+        <select class="form-select" id="combination"></select>
+      </div>
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label">Pane Type</label>
+        <div class="pane-toggle" style="margin: 0;">
+          <button id="btn-dual" type="button">Dual</button>
+          <button id="btn-triple" type="button">Triple</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label">Size (inches) — width × height</label>
+        <div class="dim-row" style="display: flex; gap: 8px; align-items: center;">
+          <input class="form-input" id="width-in" type="text" placeholder="Width">
+          <span class="x-sep">×</span>
+          <input class="form-input" id="height-in" type="text" placeholder="Height">
+        </div>
+      </div>
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" for="qty">Quantity</label>
+        <input class="form-input" id="qty" type="number" min="1" value="1">
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+      <div class="computed-area" id="computed-area" style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500;"></div>
+      <p class="hint" style="margin: 0;">Sizes accept fractions such as 30 1/2, or decimals such as 30.5.</p>
+    </div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-primary" id="calc-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h2v2H8zM14 8h2v2h-2zM8 14h2v2H8zM14 14h2v2h-2z"/></svg>
+        Calculate &amp; Add
+      </button>
+      <button class="btn btn-secondary" id="clear-form-btn">Clear Form</button>
+    </div>
+    <div class="error-box" id="error-box"></div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="card" id="breakdown-card" style="display:none; padding: 0;">
+    <details id="breakdown-details" style="padding: 16px;">
+      <summary style="font-weight: 600; cursor: pointer; color: var(--color-primary); font-size: 1.1rem; list-style: none; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        View Last Calculation Breakdown
+      </summary>
+      <div id="breakdown-body" style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 16px;"></div>
+    </details>
+  </div>
+
+  <!-- Line Items -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Quote — Line Items</h2>
+    </div>
+    <div class="table-wrap">
+      <table id="items-table">
+        <thead>
+          <tr>
+            <th>Combination</th><th>Pane</th><th>Size (in)</th><th class="num">Area (sqft)</th>
+            <th>Thickness</th><th class="num">Unit Price</th><th class="num">Qty</th><th class="num">Line Total</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="items-body">
+          <tr><td colspan="9" class="empty-state">No line items yet — calculate one above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grand-total" id="grand-total"></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-secondary" id="reset-quote-btn">Reset Quote</button>
+    </div>
+  </div>
+</div>
+      </main>
+    </div>
+  </div>
+
+<!-- ======== ALL ORIGINAL LOGIC PRESERVED BELOW ======== -->
+<script>
+'use strict';
+
+// Sidebar toggle for mobile
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// ---------------------------------------------------------------------------
+// PRICE TABLE — transcribed from the shop's pricing sheet
+// Structure: { combination: { thicknessMm: { dual: price|null, triple: price|null } } }
+// 2-lite combos have no dual price (physically only triple-pane fits 2 coated lites).
+// Solarban 70 has NO 4mm price on the source sheet.
+// ---------------------------------------------------------------------------
+const PRICE_TABLE = {
+  "Clear": {
+    3: { dual: 10.65, triple: 17.27 },
+    4: { dual: 12.78, triple: 20.28 },
+    5: { dual: 13.19, triple: 20.89 },
+    6: { dual: 13.42, triple: 22.01 },
+  },
+  "Vitro Sungate 400 - 1 Lite": {
+    3: { dual: 14.00, triple: 19.70 },
+    4: { dual: 15.82, triple: 22.69 },
+    5: { dual: 16.51, triple: 25.19 },
+    6: { dual: 16.95, triple: 26.61 },
+  },
+  "Vitro Sungate 400 - 2 Lites": {
+    3: { dual: null, triple: 22.09 },
+    4: { dual: null, triple: 25.63 },
+    5: { dual: null, triple: 28.71 },
+    6: { dual: null, triple: 30.57 },
+  },
+  "Vitro Solarban 60 - 1 Lite": {
+    3: { dual: 14.00, triple: 20.39 },
+    4: { dual: 16.82, triple: 24.00 },
+    5: { dual: 18.31, triple: 27.44 },
+    6: { dual: 19.21, triple: 28.10 },
+  },
+  "Vitro Solarban 60 - 2 Lites": {
+    3: { dual: null, triple: 24.22 },
+    4: { dual: null, triple: 28.92 },
+    5: { dual: null, triple: 31.71 },
+    6: { dual: null, triple: 33.20 },
+  },
+  "Vitro Solarban 70 - 1 Lite": {
+    3: { dual: 15.40, triple: 22.43 },
+    5: { dual: 20.14, triple: 30.18 },
+    6: { dual: 21.13, triple: 30.91 },
+  },
+  "Vitro Solarban 70 - 2 Lites": {
+    3: { dual: null, triple: 27.59 },
+    5: { dual: null, triple: 39.47 },
+    6: { dual: null, triple: 39.81 },
+  },
+};
+
+const ARGON_PER_SQFT = 0.60;
+const SURCHARGE_RATE = 0.27;
+const STEP_MULTIPLIER = 2.5;
+const FINAL_RATE = 0.08;
+const SQIN_PER_SQFT = 144;
+
+// area (sqft) -> thickness ladder: [upperBoundExclusive, thicknessMm]
+const THICKNESS_BREAKS = [ [15, 3], [30, 4], [40, 5], [50, 6] ];
+
+let selectedPane = null;
+let lineItems = [];
+
+// ---- inches parsing: decimals, plain fractions, mixed numbers ----
+function parseInchesInput(raw, fieldLabel) {
+  const text = raw.trim();
+  if (!text) throw new Error(`Please enter ${fieldLabel}.`);
+
+  const mixed = text.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) {
+    const whole = parseInt(mixed[1], 10), num = parseInt(mixed[2], 10), den = parseInt(mixed[3], 10);
+    if (den === 0) throw new Error(`Invalid fraction in ${fieldLabel} (division by zero).`);
+    return whole + num / den;
+  }
+
+  const frac = text.match(/^(\d+)\/(\d+)$/);
+  if (frac) {
+    const num = parseInt(frac[1], 10), den = parseInt(frac[2], 10);
+    if (den === 0) throw new Error(`Invalid fraction in ${fieldLabel} (division by zero).`);
+    return num / den;
+  }
+
+  const val = parseFloat(text);
+  if (isNaN(val) || val <= 0) throw new Error(`Could not parse ${fieldLabel}. Use formats like 30.5, 30 1/2, or 3/4.`);
+  return val;
+}
+
+function inchesToSqft(widthIn, heightIn) {
+  return (widthIn * heightIn) / SQIN_PER_SQFT;
+}
+
+function thicknessForArea(area) {
+  for (const [upper, mm] of THICKNESS_BREAKS) {
+    if (area < upper) return mm;
+  }
+  throw new Error(`Area ${area.toFixed(3)} sq ft exceeds 50 sq ft — no thickness rule defined. Get a manual quote.`);
+}
+
+function getBaseRate(combination, paneType, thicknessMm) {
+  const combo = PRICE_TABLE[combination];
+  if (!combo) throw new Error(`Unknown combination: '${combination}'`);
+  const t = combo[thicknessMm];
+  if (!t) throw new Error(`'${combination}' has no price listed for ${thicknessMm}mm on the source sheet.`);
+  const rate = t[paneType];
+  if (rate === undefined || rate === null) {
+    const available = Object.entries(t).filter(([k,v]) => v !== null).map(([k]) => k).join(", ");
+    throw new Error(`'${combination}' at ${thicknessMm}mm has no '${paneType}' price. Available here: ${available}.`);
+  }
+  return rate;
+}
+
+function calculatePrice(combination, paneType, widthIn, heightIn, quantity) {
+  const area = inchesToSqft(widthIn, heightIn);
+  const thicknessMm = thicknessForArea(area);
+  const baseRate = getBaseRate(combination, paneType, thicknessMm);
+  const rateWithArgon = baseRate + ARGON_PER_SQFT;
+  const rawPrice = rateWithArgon * area;
+  const surchargeAmount = rawPrice * SURCHARGE_RATE;
+  const subtotalAfterSurcharge = rawPrice + surchargeAmount;
+  const multipliedAmount = subtotalAfterSurcharge * STEP_MULTIPLIER;
+  const finalAddonAmount = multipliedAmount * FINAL_RATE;
+  const finalPrice = multipliedAmount + finalAddonAmount;
+  const totalForQuantity = finalPrice * quantity;
+
+  return {
+    combination, paneType, widthIn, heightIn, area, thicknessMm, baseRate, rateWithArgon,
+    rawPrice, surchargeAmount, subtotalAfterSurcharge, multipliedAmount,
+    finalAddonAmount, finalPrice, quantity, totalForQuantity
+  };
+}
+
+// ---- UI wiring ----
+const combinationSelect = document.getElementById('combination');
+const btnDual = document.getElementById('btn-dual');
+const btnTriple = document.getElementById('btn-triple');
+const widthInput = document.getElementById('width-in');
+const heightInput = document.getElementById('height-in');
+const computedAreaEl = document.getElementById('computed-area');
+const qtyInput = document.getElementById('qty');
+const errorBox = document.getElementById('error-box');
+const breakdownCard = document.getElementById('breakdown-card');
+const breakdownBody = document.getElementById('breakdown-body');
+const itemsBody = document.getElementById('items-body');
+const grandTotalEl = document.getElementById('grand-total');
+
+Object.keys(PRICE_TABLE).forEach(name => {
+  const opt = document.createElement('option');
+  opt.value = name; opt.textContent = name;
+  combinationSelect.appendChild(opt);
+});
+
+function comboHasDual(name) {
+  const combo = PRICE_TABLE[name];
+  return Object.values(combo).some(t => t.dual !== null && t.dual !== undefined);
+}
+
+function refreshPaneAvailability() {
+  const name = combinationSelect.value;
+  const hasDual = comboHasDual(name);
+  btnDual.disabled = !hasDual;
+  if (!hasDual && selectedPane === 'dual') selectedPane = null;
+  if (!selectedPane) selectedPane = hasDual ? null : 'triple';
+  updatePaneButtons();
+}
+
+function updatePaneButtons() {
+  btnDual.classList.toggle('active', selectedPane === 'dual');
+  btnTriple.classList.toggle('active', selectedPane === 'triple');
+}
+
+btnDual.addEventListener('click', () => { if (!btnDual.disabled) { selectedPane = 'dual'; updatePaneButtons(); } });
+btnTriple.addEventListener('click', () => { selectedPane = 'triple'; updatePaneButtons(); });
+combinationSelect.addEventListener('change', refreshPaneAvailability);
+refreshPaneAvailability();
+
+function updateComputedAreaPreview() {
+  try {
+    const w = parseInchesInput(widthInput.value, "width");
+    const h = parseInchesInput(heightInput.value, "height");
+    const area = inchesToSqft(w, h);
+    computedAreaEl.textContent = `= ${area.toFixed(3)} sq ft`;
+  } catch (e) {
+    computedAreaEl.textContent = '';
+  }
+}
+widthInput.addEventListener('input', updateComputedAreaPreview);
+heightInput.addEventListener('input', updateComputedAreaPreview);
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.style.display = 'block';
+}
+function hideError() { errorBox.style.display = 'none'; }
+
+function fmt(n) { return '$' + n.toFixed(2); }
+function fmtIn(n) { return (Number.isInteger(n) ? n.toString() : n.toFixed(3).replace(/\.?0+$/, '')); }
+
+function renderBreakdown(r) {
+  breakdownCard.style.display = 'block';
+  breakdownBody.innerHTML = `
+    <div class="breakdown-line"><span class="label">Combination</span><span>${r.combination}</span></div>
+    <div class="breakdown-line"><span class="label">Pane type</span><span>${r.paneType}</span></div>
+    <div class="breakdown-line"><span class="label">Size entered</span><span>${fmtIn(r.widthIn)}" × ${fmtIn(r.heightIn)}"</span></div>
+    <div class="breakdown-line"><span class="label">Converted area</span><span>${r.area.toFixed(3)} sqft (÷144)</span></div>
+    <div class="breakdown-line"><span class="label">Thickness selected</span><span>${r.thicknessMm}mm</span></div>
+    <div class="breakdown-line"><span class="label">Base rate ($/sqft)</span><span>${fmt(r.baseRate)}</span></div>
+    <div class="breakdown-line"><span class="label">+ Argon (0.60)</span><span>${fmt(r.rateWithArgon)}</span></div>
+    <div class="breakdown-line"><span class="label">× Area</span><span>${fmt(r.rawPrice)}</span></div>
+    <div class="breakdown-line"><span class="label">+ 27% surcharge</span><span>${fmt(r.surchargeAmount)} → ${fmt(r.subtotalAfterSurcharge)}</span></div>
+    <div class="breakdown-line"><span class="label">× 2.5</span><span>${fmt(r.multipliedAmount)}</span></div>
+    <div class="breakdown-line"><span class="label">+ 8%</span><span>${fmt(r.finalAddonAmount)}</span></div>
+    <div class="breakdown-line final"><span>Final unit price</span><span>${fmt(r.finalPrice)}</span></div>
+    <div class="breakdown-line"><span class="label">Quantity</span><span>${r.quantity}</span></div>
+    <div class="breakdown-line final"><span>Total (${r.quantity}×)</span><span>${fmt(r.totalForQuantity)}</span></div>
+  `;
+}
+
+function renderItemsTable() {
+  if (lineItems.length === 0) {
+    itemsBody.innerHTML = '<tr><td colspan="9" class="empty-state">No line items yet — calculate one above.</td></tr>';
+    grandTotalEl.textContent = '';
+    return;
+  }
+  itemsBody.innerHTML = lineItems.map((r, i) => `
+    <tr>
+      <td>${r.combination}</td>
+      <td>${r.paneType}</td>
+      <td>${fmtIn(r.widthIn)}" × ${fmtIn(r.heightIn)}"</td>
+      <td class="num">${r.area.toFixed(3)}</td>
+      <td>${r.thicknessMm}mm</td>
+      <td class="num">${fmt(r.finalPrice)}</td>
+      <td class="num">${r.quantity}</td>
+      <td class="num">${fmt(r.totalForQuantity)}</td>
+      <td><button class="remove-btn" data-idx="${i}" title="Remove">✕</button></td>
+    </tr>
+  `).join('');
+  const grand = lineItems.reduce((sum, r) => sum + r.totalForQuantity, 0);
+  grandTotalEl.textContent = `Grand Total (${lineItems.length} item${lineItems.length > 1 ? 's' : ''}): ${fmt(grand)}`;
+
+  itemsBody.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      lineItems.splice(parseInt(btn.dataset.idx, 10), 1);
+      renderItemsTable();
+    });
+  });
+}
+
+document.getElementById('calc-btn').addEventListener('click', () => {
+  hideError();
+  try {
+    if (!selectedPane) throw new Error("Select a pane type (Dual or Triple).");
+    const combination = combinationSelect.value;
+    const widthIn = parseInchesInput(widthInput.value, "width");
+    const heightIn = parseInchesInput(heightInput.value, "height");
+    const qty = parseInt(qtyInput.value, 10);
+    if (!qty || qty < 1) throw new Error("Quantity must be a positive whole number.");
+
+    const result = calculatePrice(combination, selectedPane, widthIn, heightIn, qty);
+    renderBreakdown(result);
+    lineItems.push(result);
+    renderItemsTable();
+  } catch (e) {
+    showError(e.message);
+  }
+});
+
+document.getElementById('clear-form-btn').addEventListener('click', () => {
+  widthInput.value = '';
+  heightInput.value = '';
+  computedAreaEl.textContent = '';
+  qtyInput.value = '1';
+  hideError();
+});
+
+document.getElementById('reset-quote-btn').addEventListener('click', () => {
+  lineItems = [];
+  renderItemsTable();
+  breakdownCard.style.display = 'none';
+});
+</script>
+</body>
+</html>

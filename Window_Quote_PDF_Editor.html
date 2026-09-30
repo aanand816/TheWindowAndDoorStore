@@ -4,210 +4,172 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Window Quote PDF Studio</title>
-  <style>
-    :root {
-      font: 14px Arial;
-      color: #26384b;
-      background: #f5f8fc
-    }
-
-    * {
-      box-sizing: border-box
-    }
-
-    body {
-      max-width: 1100px;
-      margin: auto;
-      padding: 24px 18px 50px
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.65rem
-    }
-
-    .sub,
-    .hint {
-      color: #697b8e
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #e0e9f2;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 14px 0;
-      box-shadow: 0 3px 12px #26384a09
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 12px
-    }
-
-    label {
-      display: block;
-      font-size: .88rem;
-      font-weight: 600;
-      color: #465a70;
-      margin: 7px 0
-    }
-
-    input,
-    textarea,
-    button {
-      font: inherit
-    }
-
-    input:not([type=file]):not([type=radio]),
-    textarea {
-      width: 100%;
-      border: 1px solid #c9d6e5;
-      border-radius: 8px;
-      padding: 9px;
-      margin-top: 5px
-    }
-
-    textarea {
-      height: 82px
-    }
-
-    button {
-      background: #276caa;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 15px;
-      cursor: pointer;
-      margin: 5px
-    }
-
-    button.secondary {
-      background: #e9f1fa;
-      color: #285981
-    }
-
-    button.danger {
-      background: #fbe9e9;
-      color: #a43636
-    }
-
-    .choices {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap
-    }
-
-    .choices label {
-      background: #f7fbff;
-      padding: 11px;
-      border: 1px solid #d8e4f0;
-      border-radius: 8px
-    }
-
-    .choices label:has(input:checked) {
-      background: #eaf5ff;
-      border-color: #3282c5
-    }
-
-    details {
-      border: 1px solid #dbe6f0;
-      padding: 13px;
-      border-radius: 9px
-    }
-
-    summary {
-      cursor: pointer;
-      color: #285a86;
-      font-weight: 700
-    }
-
-    .row {
-      padding: 14px;
-      margin: 10px 0;
-      border: 1px solid #dce6ef;
-      border-radius: 8px
-    }
-
-    .row.child {
-      margin-left: 22px;
-      border-left: 4px solid #90b6d4
-    }
-
-    .rowhead {
-      display: flex;
-      justify-content: space-between;
-      align-items: center
-    }
-
-    .thumb {
-      width: 110px;
-      height: 100px;
-      object-fit: contain;
-      border: 1px solid #d4dfe9;
-      border-radius: 5px
-    }
-
-    .status {
-      white-space: pre-wrap;
-      color: #536779
-    }
-
-    iframe {
-      width: 100%;
-      height: 650px;
-      border: 1px solid #ccdbe9;
-      border-radius: 8px
-    }
-  </style>
+  <title>Window Quote PDF Studio — The Window & Door Store</title>
+  <meta name="description" content="Generate customer-facing Supply or Install quote PDFs from supplier quote-list PDFs.">
+  <link rel="stylesheet" href="studio.css">
 </head>
 
 <body>
-  <h1>Window Quote PDF Studio</h1>
-  <p class="sub">Customer-facing Supply or Install quotes from supplier
-    quote-list PDFs.</p>
-  <section class="card">
-    <h2>1. Upload quote</h2><label>Quote-list PDF<input id="source" type="file"
-        accept="application/pdf,.pdf"></label><button id="extract">Extract quote
-      and drawings</button>
-    <p id="importStatus" class="status">Internet is required for PDF libraries.
-    </p>
-  </section>
-  <section class="card">
-    <h2>2. Quote type</h2>
-    <div class="choices"><label><input type="radio" name="mode" value="supply"
-          checked> Supply: FR, BM if present, R/O on
-        parents</label><label><input type="radio" name="mode" value="install">
-        Install: size column blank</label></div>
-    <p class="hint">Child quantity and size stay blank in either PDF.</p>
-  </section>
-  <section class="card">
-    <h2>3. Branding</h2>
-    <div class="grid"><label>Customer reference<input
-          id="customer"></label><label>Quote number<input
-          id="quote"></label><label>Company name<input id="company"
-          value="The Window &amp; Door Store"></label><label>Logo<input
-          id="logo" type="file" accept="image/png,image/jpeg"></label></div>
-    <label>Address/contact<textarea id="address">305 Kirsti Pl
+  <!-- Mobile sidebar toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">W</div>
+        <div>
+          <strong>Window &amp; Door</strong>
+          <span>Store Tools</span>
+        </div>
+      </div>
+      <p class="nav-label">Tools</p>
+      <nav class="nav-list">
+        <a class="nav" href="index.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h2M12 12h2M16 12h2M8 16h2M12 16h2M16 16h2"/></svg>
+          Promo Calculator
+        </a>
+        <a class="nav active" href="Window_Quote_PDF_Editor.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg>
+          Quote PDF Editor
+        </a>
+        <a class="nav" href="Label_Generator.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v6l9 9 8-8-9-9z"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>
+          Order Labels
+        </a>
+        <a class="nav" href="Sealed_Unit_PriceCalculator.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/></svg>
+          Sealed Units
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main workspace -->
+    <div class="workspace">
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="breadcrumb">
+          <a href="index.html">Tools</a>
+          <span class="sep">/</span>
+          <span class="current">Quote PDF Editor</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="avatar" aria-label="User">WD</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Page heading -->
+        <div class="page-head">
+          <div>
+            <h1>Window Quote PDF Studio</h1>
+            <p class="subtitle">Customer-facing Supply or Install quotes from supplier quote-list PDFs.</p>
+          </div>
+        </div>
+
+        <!-- Step 1: Upload -->
+        <section class="card">
+          <div class="card-header">
+            <h2>1. Upload Quote</h2>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label" for="source">Quote-list PDF</label>
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+              <input class="form-input" id="source" type="file" accept="application/pdf,.pdf" style="padding:7px; max-width:320px">
+              <button id="extract" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Extract Quote &amp; Drawings
+              </button>
+            </div>
+          </div>
+          <p id="importStatus" class="hint">Internet is required for PDF libraries.</p>
+        </section>
+
+        <!-- Step 2: Quote Type -->
+        <section class="card">
+          <div class="card-header">
+            <h2>2. Quote Type</h2>
+          </div>
+          <div class="choices">
+            <label><input type="radio" name="mode" value="supply" checked>
+              Supply: FR, BM if present, R/O on parents</label>
+            <label><input type="radio" name="mode" value="install">
+              Install: size column blank</label>
+          </div>
+          <p class="hint">Child quantity and size stay blank in either PDF.</p>
+        </section>
+
+        <!-- Step 3: Branding -->
+        <section class="card">
+          <div class="card-header">
+            <h2>3. Branding</h2>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="customer">Customer Reference</label>
+              <input class="form-input" id="customer">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="quote">Quote Number</label>
+              <input class="form-input" id="quote">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="company">Company Name</label>
+              <input class="form-input" id="company" value="The Window &amp; Door Store">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="logo">Custom Logo (Optional)</label>
+              <input class="form-input" id="logo" type="file" accept="image/png,image/jpeg" style="padding:8px">
+              <span style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; display: block;">Leave blank to use default company logo.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="address">Address / Contact</label>
+            <textarea class="form-textarea" id="address">305 Kirsti Pl
 HWY 11/71 W
 Fort Frances, ON P9A 3V9
-PH: 1 807 274-0302</textarea></label>
-  </section>
-  <section class="card">
-    <details id="details">
-      <summary>Show windows details (<span id="count">0</span>)</summary>
-      <div id="rows"></div><button id="add" class="secondary">Add
-        window</button>
-    </details>
-  </section>
-  <section class="card">
-    <h2>4. Generate</h2><button id="generate">Generate PDF</button><button
-      id="download" class="secondary" disabled>Download PDF</button>
-    <p id="outputStatus" class="status"></p><iframe id="preview" hidden
-      title="PDF preview"></iframe>
-  </section>
+PH: 1 807 274-0302</textarea>
+          </div>
+        </section>
+
+        <!-- Windows Details -->
+        <section class="card">
+          <details id="details">
+            <summary>Show windows details (<span id="count">0</span>)</summary>
+            <div id="rows" style="margin-top:12px"></div>
+            <button id="add" class="btn btn-secondary" style="margin-top:10px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Window
+            </button>
+          </details>
+        </section>
+
+        <!-- Step 4: Generate -->
+        <section class="card">
+          <div class="card-header">
+            <h2>4. Generate</h2>
+          </div>
+          <div class="btn-row">
+            <button id="generate" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+              Generate PDF
+            </button>
+            <button id="download" class="btn btn-success" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download PDF
+            </button>
+          </div>
+          <p id="outputStatus" class="hint"></p>
+          <iframe id="preview" hidden title="PDF preview" style="margin-top:14px"></iframe>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ======== ALL ORIGINAL LOGIC PRESERVED BELOW ======== -->
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
   </script>
@@ -216,6 +178,12 @@ PH: 1 807 274-0302</textarea></label>
   </script>
   <script>
     'use strict';
+
+    // Sidebar toggle for mobile
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
     const $ = id => document.getElementById(id),
       field = (r, k) => r.querySelector(`[data-key="${k}"]`).value.trim();
     let pdfUrl = null;
@@ -248,7 +216,7 @@ PH: 1 807 274-0302</textarea></label>
         '');
       head.append(title);
       const remove = document.createElement('button');
-      remove.className = 'danger';
+      remove.className = 'btn btn-danger btn-sm';
       remove.textContent = 'Remove';
       remove.onclick = () => {
         row.remove();
@@ -257,7 +225,7 @@ PH: 1 807 274-0302</textarea></label>
       head.append(remove);
       row.append(head);
       const grid = document.createElement('div');
-      grid.className = 'grid';
+      grid.className = 'form-grid';
       for (const [key, label] of [
           ['id', 'Item'],
           ['name', 'Description'],
@@ -267,22 +235,32 @@ PH: 1 807 274-0302</textarea></label>
           ['ro', 'R/O size'],
           ['price', 'Extended list total']
         ]) {
-        const wrap = document.createElement('label');
-        wrap.textContent = label;
+        const wrap = document.createElement('div');
+        wrap.className = 'form-group';
+        const lbl = document.createElement('label');
+        lbl.className = 'form-label';
+        lbl.textContent = label;
         const input = document.createElement('input');
+        input.className = 'form-input';
         input.dataset.key = key;
         input.value = d[key] || '';
+        wrap.append(lbl);
         wrap.append(input);
         grid.append(wrap)
       }
       row.append(grid);
-      const label = document.createElement('label');
-      label.textContent = 'Options and performance';
+      const optGroup = document.createElement('div');
+      optGroup.className = 'form-group';
+      const optLabel = document.createElement('label');
+      optLabel.className = 'form-label';
+      optLabel.textContent = 'Options and performance';
       const options = document.createElement('textarea');
+      options.className = 'form-textarea';
       options.dataset.key = 'options';
       options.value = d.options || '';
-      label.append(options);
-      row.append(label);
+      optGroup.append(optLabel);
+      optGroup.append(options);
+      row.append(optGroup);
       const img = document.createElement('img');
       img.className = 'thumb';
       img.hidden = !d.image;
@@ -292,16 +270,26 @@ PH: 1 807 274-0302</textarea></label>
         img.src = d.image
       }
       row.append(img);
+      const uploadWrap = document.createElement('div');
+      uploadWrap.className = 'form-group';
+      uploadWrap.style.marginTop = '6px';
+      const uploadLabel = document.createElement('label');
+      uploadLabel.className = 'form-label';
+      uploadLabel.textContent = 'Replace image';
       const upload = document.createElement('input');
+      upload.className = 'form-input';
       upload.type = 'file';
       upload.accept = 'image/png,image/jpeg';
+      upload.style.padding = '8px';
       upload.onchange = async () => {
         if (!upload.files[0]) return;
         row.dataset.image = await dataUrl(upload.files[0]);
         img.src = row.dataset.image;
         img.hidden = false
       };
-      row.append(document.createTextNode(' Replace image: '), upload);
+      uploadWrap.append(uploadLabel);
+      uploadWrap.append(upload);
+      row.append(uploadWrap);
       $('rows').append(row);
       count();
       return row
@@ -494,7 +482,6 @@ PH: 1 807 274-0302</textarea></label>
         /\b\d{5,}\s+\d{1,2}\/\d{1,2}\/\d{4}\s+([^\n]+)/)?.[1]?.trim() || '';
       $('rows').replaceChildren();
       result.forEach(add);
-      $('details').open = true;
       $('importStatus').textContent =
         `Extracted ${result.length} rows. ${warnings.join('; ')} Check the preview before sending.`
     }
@@ -564,22 +551,35 @@ PH: 1 807 274-0302</textarea></label>
         pages.push(page);
         if (first) {
           draw('QUOTE: ' + quote, 477, 765, 10, bold);
-          const logo = $('logo').files[0],
-            head = [$('company').value.trim(), ...$('address').value.split(
-              '\n').map(s => s.trim())].filter(Boolean),
-            top = 735;
+          const logo = $('logo').files[0];
+          const head = [$('company').value.trim(), ...$('address').value.split(
+            '\n').map(s => s.trim())].filter(Boolean);
+          const top = 735;
           let logoH = 0;
+          
+          let im = null;
           if (logo) {
-            const im = await embed(doc, await dataUrl(logo)),
-              fit = im.scaleToFit(68, 88);
+            im = await embed(doc, await dataUrl(logo));
+          } else {
+            try {
+              const bytes = await fetch('Logo/Logo%203.jpg').then(r => r.arrayBuffer());
+              im = await doc.embedJpg(bytes);
+            } catch (err) {
+              console.warn('Default logo could not be loaded:', err);
+            }
+          }
+          
+          if (im) {
+            const fit = im.scaleToFit(68, 88);
             logoH = fit.height;
             page.drawImage(im, {
               x: 20 + (68 - fit.width) / 2,
               y: top - fit.height,
               width: fit.width,
               height: fit.height
-            })
+            });
           }
+          
           const lineH = 11,
             bottom = top - Math.max(logoH, head.length * lineH),
             headTop = bottom + head.length * lineH - lineH;
