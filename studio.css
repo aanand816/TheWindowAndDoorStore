@@ -925,6 +925,14 @@ iframe {
   background: rgba(43, 108, 176, 0.04);
   box-shadow: 0 0 0 1px var(--color-primary);
 }
+.promo-card.lowest {
+  border-color: #1e293b;
+  border-width: 2px;
+}
+.promo-card.selected.lowest {
+  border-color: #1e293b;
+  box-shadow: 0 0 0 1px #1e293b;
+}
 .promo-name {
   font-size: .85rem;
   font-weight: 600;
