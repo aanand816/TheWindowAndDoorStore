@@ -77,6 +77,8 @@
               Import Excel
             </button>
             <input id="excelFile" type="file" accept=".xlsx,.xlsm" hidden>
+            <button id="importPdf" class="btn btn-secondary" type="button">Import PDF</button>
+            <input id="pdfFile" type="file" accept=".pdf,application/pdf" hidden>
           </div>
         </div>
 
@@ -916,11 +918,131 @@
       }
     };
     
+
+    // ---- PDF import: same output shape as parseManufacturerQuote ----
+    function pdfItemsToRows(items) {
+      const sorted = [...items].sort((a, b) => a.page - b.page || a.y - b.y || a.x - b.x);
+      const rowsOut = [];
+      let cur = null;
+      for (const it of sorted) {
+        if (!String(it.str).trim()) continue;
+        if (!cur || cur.page !== it.page || Math.abs(it.y - cur.y) > 3) {
+          cur = { page: it.page, y: it.y, items: [] };
+          rowsOut.push(cur);
+        }
+        cur.items.push(it);
+      }
+      return rowsOut.map(r => {
+        const its = r.items.sort((a, b) => a.x - b.x);
+        const money = s => Number(s.replace(/[$,]/g, ''));
+        const out = { page: r.page, y: r.y, no: '', qty: null, label: '', list: null, total: null };
+        const labelParts = [];
+        for (const it of its) {
+          const s = String(it.str).trim();
+          if (it.x < 50 && !out.no && !labelParts.length && /^\d+(?:\.\d+)?$/.test(s)) { out.no = s; continue; }
+          if (it.x >= 250 && it.x < 285 && /^\d+$/.test(s)) { out.qty = Number(s); continue; }
+          if (it.x >= 370 && /^\$[\d,]+\.\d{2}$/.test(s)) {
+            if (it.x < 445) out.list = money(s); else out.total = money(s);
+            continue;
+          }
+          if (it.x < 250) labelParts.push(s);
+        }
+        out.label = labelParts.join(' ').replace(/\s+/g, ' ').trim();
+        return out;
+      }).filter(r => r.y < 740);
+    }
+
+    function parseManufacturerPdfItems(items) {
+      const R = pdfItemsToRows(items);
+      const starts = [];
+      R.forEach((r, i) => {
+        if (/^[1-9]\d*$/.test(r.no) && r.label && r.qty !== null) starts.push(i);
+      });
+      const imported = [];
+      for (let pi = 0; pi < starts.length; pi++) {
+        const start = starts[pi], end = starts[pi + 1] ?? R.length;
+        const id = R[start].no;
+        const childRe = new RegExp('^' + id + '\\.\\d+$');
+        const children = [];
+        for (let r = start + 1; r < end; r++)
+          if (childRe.test(R[r].no) && R[r].label) children.push(r);
+        let total = null;
+        for (let r = start + 1; r < end; r++) {
+          if (R[r].label.toUpperCase().startsWith('LINE ITEM TOTAL:')) { total = R[r].list; break; }
+        }
+        if (total === null || total <= 0) throw new Error(
+          'Missing parent list LINE ITEM TOTAL for group ' + id + '. Nothing imported.');
+        const option = (from, to, name) => {
+          let amount = 0;
+          for (let r = from + 1; r < to; r++) {
+            if (R[r].label.toUpperCase() !== name) continue;
+            if (R[r].list === null) throw new Error('Missing ' + name +
+              ' list price in PDF (page ' + (R[r].page + 1) + ', group ' + id + '). Nothing imported.');
+            amount += Math.round(R[r].list * 100);
+          }
+          return amount;
+        };
+        const sections = children.length
+          ? children.map((r, j) => [r, children[j + 1] ?? end]) : [[start, end]];
+        const totalOption = name => sections.reduce((s, sec) => s + option(sec[0], sec[1], name), 0);
+        imported.push({
+          id, qty: R[start].qty, base: total,
+          argon: totalOption('ARGON') / 100,
+          solar: totalOption('SOLAR GAIN') / 100,
+          triple: (totalOption('TRIPLE GLAZED') + totalOption('TRIPLE PANE')) / 100
+        });
+      }
+      if (!imported.length) throw new Error('No numbered window items found in PDF. Nothing imported.');
+      return imported;
+    }
+
+    async function readPdfItems(file) {
+      if (!window.pdfjsLib) throw new Error('PDF reader did not load. Connect to the internet, then reopen the application.');
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      const pdfDoc = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+      const items = [];
+      for (let p = 1; p <= pdfDoc.numPages; p++) {
+        const page = await pdfDoc.getPage(p);
+        const h = page.getViewport({ scale: 1 }).height;
+        const content = await page.getTextContent();
+        for (const t of content.items) {
+          if (!t.str || !t.str.trim()) continue;
+          items.push({ page: p - 1, x: t.transform[4], y: h - t.transform[5], str: t.str });
+        }
+      }
+      return items;
+    }
+
+    document.getElementById('importPdf').onclick = () => document.getElementById('pdfFile').click();
+    document.getElementById('pdfFile').onchange = async event => {
+      const file = event.target.files?.[0],
+        status = document.getElementById('excelStatus'),
+        bar = document.getElementById('statusBar');
+      event.target.value = '';
+      if (!file) return;
+      try {
+        const imported = parseManufacturerPdfItems(await readPdfItems(file));
+        rows.innerHTML = '';
+        imported.forEach(item => addRow(item));
+        lastQuote = null;
+        bar.style.display = 'flex';
+        status.textContent = `Imported ${imported.length} window(s) from PDF ${file.name}. Review amounts, then click Calculate quote.`;
+        bar.className = 'alert alert-success';
+        quote();
+      } catch (error) {
+        bar.style.display = 'flex';
+        status.textContent = 'PDF import failed: ' + error.message;
+        bar.className = 'alert alert-danger';
+      }
+    };
+
     // Auto-calculate on initial load to show the promo calculator UI
     window.addEventListener('DOMContentLoaded', () => {
       quote();
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
   </script>
 </body>
