@@ -5,28 +5,68 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Window Promo Quote Calculator — The Window & Door Store</title>
-  <meta name="description" content="Calculate window promo quotes with surcharge, tax, and promotional discounts for The Window & Door Store.">
+  <meta name="description"
+    content="Calculate window promo quotes with surcharge, tax, and promotional discounts for The Window & Door Store.">
   <link rel="stylesheet" href="studio.css">
   <style>
     /* Page-specific overrides */
-    .component { width: 82px; }
-    #error, #taxError, #fileStatus { min-height: 1.2em; font-size: .88rem; }
-    #error, #taxError { color: var(--color-danger); }
+    .component {
+      width: 82px;
+    }
+
+    #error,
+    #taxError,
+    #fileStatus {
+      min-height: 1.2em;
+      font-size: .88rem;
+    }
+
+    #error,
+    #taxError {
+      color: var(--color-danger);
+    }
 
     /* Promo card highlight: only the selected card gets a border; lowest keeps its tag only */
-    .promo-card { position: relative; border: 2px solid var(--color-border, #e2e8f0) !important; }
-    .promo-card.lowest { border-color: var(--color-border, #e2e8f0) !important; }
-    .promo-card.selected, .promo-card.selected.lowest { border-color: #14532d !important; box-shadow: 0 0 0 1px #14532d; }
-    .promo-card.disabled { opacity: .55; cursor: not-allowed; }
-    .promo-card .promo-lowest { position: absolute; top: -11px; left: 12px; background: #14532d; color: #fff;
-      font-size: .72rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+    .promo-card {
+      position: relative;
+      border: 2px solid var(--color-border, #e2e8f0) !important;
+    }
+
+    .promo-card.lowest {
+      border-color: var(--color-border, #e2e8f0) !important;
+    }
+
+    .promo-card.selected,
+    .promo-card.selected.lowest {
+      border-color: #14532d !important;
+      box-shadow: 0 0 0 1px #14532d;
+    }
+
+    .promo-card.disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .promo-card .promo-lowest {
+      position: absolute;
+      top: -11px;
+      left: 12px;
+      background: #14532d;
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
   </style>
 </head>
 
 <body>
   <!-- Mobile sidebar toggle -->
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18M3 6h18M3 18h18" />
+    </svg>
   </button>
 
   <div class="app-shell">
@@ -42,23 +82,45 @@
       <p class="nav-label">Tools</p>
       <nav class="nav-list">
         <a class="nav active" href="index.html">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h2M12 12h2M16 12h2M8 16h2M12 16h2M16 16h2"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <rect x="5" y="3" width="14" height="18" rx="2" />
+            <path d="M8 8h8M8 12h2M12 12h2M16 12h2M8 16h2M12 16h2M16 16h2" />
+          </svg>
           Promo Calculator
         </a>
         <a class="nav" href="Window_Quote_PDF_Editor.html">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+            <path d="M14 3v5h5M8 13h8M8 17h5" />
+          </svg>
           Quote PDF Editor
         </a>
         <a class="nav" href="Label_Generator.html">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v6l9 9 8-8-9-9z"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <path d="M12 3H5a2 2 0 0 0-2 2v6l9 9 8-8-9-9z" />
+            <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
+          </svg>
           Order Labels
         </a>
         <a class="nav" href="Sealed_Unit_PriceCalculator.html">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M12 3v18M3 12h18" />
+          </svg>
           Sealed Units
         </a>
         <a class="nav" href="door_supply_quote_studio_v10.html">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
           Door Quote Studio
         </a>
       </nav>
@@ -85,7 +147,11 @@
           </div>
           <div class="page-head-actions">
             <button id="importExcel" class="btn btn-secondary" type="button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
               Import Excel
             </button>
             <input id="excelFile" type="file" accept=".xlsx,.xlsm" hidden>
@@ -105,7 +171,8 @@
             <h2>Windows</h2>
             <div class="toolbar-inline">
               <label class="form-label" for="surcharge" style="margin:0">Surcharge (%)</label>
-              <input class="form-input" id="surcharge" type="number" min="0" step="0.01" value="8" style="width:70px; text-align:center">
+              <input class="form-input" id="surcharge" type="number" min="0" step="0.01" value="8"
+                style="width:70px; text-align:center">
             </div>
           </div>
           <div class="table-wrap">
@@ -126,7 +193,10 @@
           </div>
           <div style="margin-top:12px">
             <button id="add" class="btn btn-secondary btn-sm" type="button">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
               Add Window
             </button>
           </div>
@@ -151,18 +221,25 @@
                 Calculate Quote
               </button>
               <button id="taxButton" class="btn btn-success" type="button" style="display:none">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
                 Tax Calculation
               </button>
             </div>
           </div>
-          <div class="metrics-row"><div class="metric-card">
+          <div class="metrics-row">
+            <div class="metric-card">
               <div>
                 <div class="metric-label">Base window price</div>
                 <div class="metric-value" id="base">$0.00</div>
               </div>
               <div class="metric-icon teal">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M12 3v18M3 12h18" />
+                </svg>
               </div>
             </div>
             <div class="metric-card">
@@ -171,7 +248,9 @@
                 <div class="metric-value" id="surchargeTotal">$0.00</div>
               </div>
               <div class="metric-icon green">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
               </div>
             </div>
             <div class="metric-card">
@@ -180,7 +259,10 @@
                 <div class="metric-value" id="discount">$0.00</div>
               </div>
               <div class="metric-icon pink">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                  <line x1="7" y1="7" x2="7.01" y2="7" />
+                </svg>
               </div>
             </div>
             <div class="metric-card" style="border-color: var(--color-primary);">
@@ -189,7 +271,10 @@
                 <div class="metric-value" id="final" style="color: var(--color-primary-dark);">$0.00</div>
               </div>
               <div class="metric-icon teal">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
               </div>
             </div>
           </div>
@@ -205,21 +290,18 @@
             <div class="tax-field"><label for="taxBase">1. Base price of
                 windows</label><input class="form-input" id="taxBase" type="number" min="0" step="0.01"
                 placeholder="Calculate quote first"></div>
-            <div class="tax-field"><label for="taxJC">2. J &amp; C</label><input
-                class="form-input" id="taxJC" type="number" min="0" step="0.01"
-                placeholder="Enter amount"></div>
-            <div class="tax-field"><label for="taxMisc">3. Miscellaneous</label><input
-                class="form-input" id="taxMisc" type="number" min="0" step="0.01"
-                placeholder="Enter amount"></div>
-            <div class="tax-field"><label for="taxLabour">4. Labour</label><input
-                class="form-input" id="taxLabour" type="number" min="0" step="0.01"
-                placeholder="Enter amount"></div>
+            <div class="tax-field"><label for="taxJC">2. J &amp; C</label><input class="form-input" id="taxJC"
+                type="number" min="0" step="0.01" placeholder="Enter amount"></div>
+            <div class="tax-field"><label for="taxMisc">3. Miscellaneous</label><input class="form-input" id="taxMisc"
+                type="number" min="0" step="0.01" placeholder="Enter amount"></div>
+            <div class="tax-field"><label for="taxLabour">4. Labour</label><input class="form-input" id="taxLabour"
+                type="number" min="0" step="0.01" placeholder="Enter amount"></div>
             <div class="tax-field"><label for="taxSurcharge">5.
-                Surcharge</label><input class="form-input" id="taxSurcharge" type="number" min="0"
-                step="0.01" placeholder="Calculate quote first"></div>
+                Surcharge</label><input class="form-input" id="taxSurcharge" type="number" min="0" step="0.01"
+                placeholder="Calculate quote first"></div>
             <div class="tax-field"><label for="taxDiscount">6. Discount (promo
-                discount)</label><input class="form-input" id="taxDiscount" type="number" min="0"
-                step="0.01" placeholder="Calculate quote first"></div>
+                discount)</label><input class="form-input" id="taxDiscount" type="number" min="0" step="0.01"
+                placeholder="Calculate quote first"></div>
           </div>
           <p id="taxPromoNote" class="hint">Click Calculate quote to carry the
             selected promo values into this section.
@@ -344,9 +426,9 @@
     }
 
     function addRow(v = {}) {
-    const r = document.createElement('tr');
-    r.innerHTML =
-    `<td class="seq"></td>
+      const r = document.createElement('tr');
+      r.innerHTML =
+        `<td class="seq"></td>
     <td><input class="qty form-input" type="number" min="1" step="1" value="${v.qty ?? 1}" style="width:70px">
     </td>
     <td><input class="base form-input" type="number" min="0" step="0.01"
@@ -358,15 +440,15 @@
     <td><input class="triple component form-input" type="text" inputmode="decimal"
         value="${v.triple ?? ''}" placeholder="0.00" style="width:90px"></td>
     <td><button class="btn btn-danger btn-sm remove" type="button">Remove</button></td>`;
-    r.querySelectorAll('.component').forEach(setupComponentField);
-    r.querySelector('.remove').onclick = () => {
-      r.remove();
+      r.querySelectorAll('.component').forEach(setupComponentField);
+      r.querySelector('.remove').onclick = () => {
+        r.remove();
+        renumber();
+        quote();
+      };
+      rows.appendChild(r);
       renumber();
-      quote();
-    };
-    rows.appendChild(r);
-    renumber();
-    return r
+      return r
     }
 
     function renumber() {
@@ -440,7 +522,7 @@
         document.getElementById('metrics-card').style.display = 'none';
         return
       }
-      
+
       const base = items.reduce((a, x) => a + x.base, 0),
         sur = Math.round(base * rate / 100);
 
@@ -543,7 +625,7 @@
 
       document.getElementById('taxButton').style.display = 'inline-flex';
       document.getElementById('metrics-card').style.display = 'block';
-      
+
       lastQuote = {
         base,
         surcharge: sur,
@@ -626,8 +708,8 @@
       document.getElementById('paymentTwo').textContent = money(second);
       const msg = wants && after < 300000 ?
         'Upgrade not available below $3,000.' : wants ?
-        `5-year labour upgrade price: ${money(shown)} at ${upgrade.rate}. This price is not included in HST or the total.` :
-        '5-year labour upgrade not selected.';
+          `5-year labour upgrade price: ${money(shown)} at ${upgrade.rate}. This price is not included in HST or the total.` :
+          '5-year labour upgrade not selected.';
       document.getElementById('upgradeMessage').textContent = msg;
       document.getElementById('taxExplanation').textContent =
         `${money(before)} − ${money(disc)} promo discount = ${money(after)}. ${msg} HST: ${money(hst)}. Payment split: ${money(first)} + ${money(second)}.`
@@ -714,7 +796,7 @@
           document.getElementById('taxSurcharge').value = t.surcharge ?? '';
           document.getElementById('taxDiscount').value = t.discount ?? '';
           document.getElementById('labourUpgrade').checked = !!t
-          .labourUpgrade;
+            .labourUpgrade;
           document.getElementById('taxCard').hidden = !t.taxOpen;
           lastQuote = null;
           status.textContent =
@@ -825,7 +907,7 @@
         for (let r = start + 1; r < end - 1; r++) {
           if (sheet[r].some(v => str(v).toUpperCase() === 'LINE ITEM TOTAL:')) {
             total = num(sheet[r + 1][
-            41]); // AP: list-price line total, next row
+              41]); // AP: list-price line total, next row
             break;
           }
         }
@@ -875,7 +957,7 @@
       try {
         if (!window.XLSX) throw new Error(
           'Excel reader did not load. Connect to the internet, then reopen the application.'
-          );
+        );
         const workbook = XLSX.read(await file.arrayBuffer(), {
           type: 'array'
         });
@@ -905,7 +987,7 @@
         bar.className = 'alert alert-danger';
       }
     };
-    
+
 
     // ---- PDF import: same output shape as parseManufacturerQuote ----
     function pdfItemsToRows(items) {
@@ -933,7 +1015,7 @@
             if (it.x < 445) out.list = money(s); else out.total = money(s);
             continue;
           }
-          if (it.x < 250) labelParts.push(s);
+          if (it.x < 250 || /LINE|ITEM|TOTAL/i.test(s)) labelParts.push(s);
         }
         out.label = labelParts.join(' ').replace(/\s+/g, ' ').trim();
         return out;
@@ -956,17 +1038,18 @@
           if (childRe.test(R[r].no) && R[r].label) children.push(r);
         let total = null;
         for (let r = start + 1; r < end; r++) {
-          if (R[r].label.toUpperCase().startsWith('LINE ITEM TOTAL:')) { total = R[r].list; break; }
+          if (R[r].label.toUpperCase().startsWith('LINE ITEM TOTAL')) { total = R[r].list ?? R[r].total; break; }
         }
         if (total === null || total <= 0) throw new Error(
           'Missing parent list LINE ITEM TOTAL for group ' + id + '. Nothing imported.');
         const option = (from, to, name) => {
           let amount = 0;
           for (let r = from + 1; r < to; r++) {
-            if (R[r].label.toUpperCase() !== name) continue;
-            if (R[r].list === null) throw new Error('Missing ' + name +
+            if (!R[r].label.toUpperCase().startsWith(name)) continue;
+            const price = R[r].list ?? R[r].total;
+            if (price === null) throw new Error('Missing ' + name +
               ' list price in PDF (page ' + (R[r].page + 1) + ', group ' + id + '). Nothing imported.');
-            amount += Math.round(R[r].list * 100);
+            amount += Math.round(price * 100);
           }
           return amount;
         };
