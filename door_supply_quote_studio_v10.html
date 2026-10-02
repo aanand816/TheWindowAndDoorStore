@@ -289,7 +289,13 @@ async function renderRegion(page,r,yTop){
 async function renderDoorRaw(page,items){
   const rects=imageRects(await page.getOperatorList());
   const view=page.view, pageH=view[3]-view[1];
-  const valid=rects.filter(r=>r.y0>50 && r.y1<pageH-100 && (r.x1-r.x0)>20 && (r.y1-r.y0)>20);
+  const valid = rects.filter(r => {
+    const w = r.x1 - r.x0, h = r.y1 - r.y0;
+    if (w < 20 || h < 20) return false;
+    if (r.y1 > pageH - 150 && h < 100) return false;
+    if (r.y0 < 100 && h < 50) return false;
+    return true;
+  });
   if(!valid.length)return null;
   const combined={
     x0:Math.min(...valid.map(r=>r.x0)),
