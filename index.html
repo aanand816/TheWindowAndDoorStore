@@ -12,6 +12,14 @@
     .component { width: 82px; }
     #error, #taxError, #fileStatus { min-height: 1.2em; font-size: .88rem; }
     #error, #taxError { color: var(--color-danger); }
+
+    /* Promo card highlight: only the selected card gets a border; lowest keeps its tag only */
+    .promo-card { position: relative; border: 2px solid var(--color-border, #e2e8f0) !important; }
+    .promo-card.lowest { border-color: var(--color-border, #e2e8f0) !important; }
+    .promo-card.selected, .promo-card.selected.lowest { border-color: #14532d !important; box-shadow: 0 0 0 1px #14532d; }
+    .promo-card.disabled { opacity: .55; cursor: not-allowed; }
+    .promo-card .promo-lowest { position: absolute; top: -11px; left: 12px; background: #14532d; color: #fff;
+      font-size: .72rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
   </style>
 </head>
 
@@ -144,10 +152,9 @@
               </button>
             </div>
           </div>
-          <div class="metrics-row">
-            <div class="metric-card">
+          <div class="metrics-row"><div class="metric-card">
               <div>
-                <div class="metric-label">Base Windows</div>
+                <div class="metric-label">Base window price</div>
                 <div class="metric-value" id="base">$0.00</div>
               </div>
               <div class="metric-icon teal">
@@ -156,29 +163,11 @@
             </div>
             <div class="metric-card">
               <div>
-                <div class="metric-label">Surcharge (Base Price)</div>
+                <div class="metric-label">Surcharge (on base price)</div>
                 <div class="metric-value" id="surchargeTotal">$0.00</div>
               </div>
               <div class="metric-icon green">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
-            </div>
-            <div class="metric-card">
-              <div>
-                <div class="metric-label">Argon + Solar Removed</div>
-                <div class="metric-value" id="extras">$0.00</div>
-              </div>
-              <div class="metric-icon blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              </div>
-            </div>
-            <div class="metric-card">
-              <div>
-                <div class="metric-label">Triple Pane Removed</div>
-                <div class="metric-value" id="tripleRemoved">$0.00</div>
-              </div>
-              <div class="metric-icon amber">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2M12 15h.01M5.07 19h13.86c1.14 0 1.87-1.22 1.32-2.2L13.32 4.27a1.5 1.5 0 0 0-2.64 0L3.75 16.8A1.5 1.5 0 0 0 5.07 19z"/></svg>
               </div>
             </div>
             <div class="metric-card">
@@ -192,7 +181,7 @@
             </div>
             <div class="metric-card" style="border-color: var(--color-primary);">
               <div>
-                <div class="metric-label" style="color: var(--color-primary); font-weight:700">Final Total</div>
+                <div class="metric-label" style="color: var(--color-primary); font-weight:700">Final price</div>
                 <div class="metric-value" id="final" style="color: var(--color-primary-dark);">$0.00</div>
               </div>
               <div class="metric-icon teal">
@@ -395,34 +384,25 @@
       return o
     }
 
-    function b2(p) {
+    function groupPromo(p, half, full) {
+      const size = half + full;
+      if (p.length < size) return null;
       const s = [...p].sort((a, b) => a - b);
-      let d = 0,
-        l = 0,
-        r = s.length - 1;
-      while (r - l + 1 >= 4) {
-        d += Math.round((s[l] + s[l + 1]) * 50) / 100;
-        l += 2;
-        r -= 2
+      let d = 0, l = 0, r = s.length - 1;
+      while (r - l + 1 >= size) {
+        let sum = 0;
+        for (let k = 0; k < half; k++) sum += s[l + k];
+        d += Math.round(sum * 50) / 100;
+        l += half;
+        r -= full;
       }
-      if (r - l + 1 === 3) d += Math.round(s[l] * 50) / 100;
-      return Math.round(d)
-    }
-
-    function b3(p) {
-      const s = [...p].sort((a, b) => a - b);
-      let d = 0,
-        l = 0,
-        r = s.length - 1;
-      while (r - l + 1 >= 6) {
-        d += Math.round((s[l] + s[l + 1] + s[l + 2]) * 50) / 100;
-        l += 3;
-        r -= 3
+      const rest = r - l + 1;
+      if (rest > full) {
+        let sum = 0;
+        for (let k = 0; k < Math.min(half, rest - full); k++) sum += s[l + k];
+        d += Math.round(sum * 50) / 100;
       }
-      const rest = s.slice(l, r + 1);
-      if (rest.length === 5) d += Math.round((rest[0] + rest[1]) * 50) / 100;
-      else if (rest.length === 4) d += Math.round(rest[0] * 50) / 100;
-      return Math.round(d)
+      return Math.round(d);
     }
 
     function fillTax(q) {
@@ -460,96 +440,100 @@
       const base = items.reduce((a, x) => a + x.base, 0),
         sur = Math.round(base * rate / 100);
 
+      const unitList = units(items);
+      const unitCount = unitList.length;
+      const argonSum = items.reduce((a, x) => a + x.argon, 0);
+      const solarSum = items.reduce((a, x) => a + x.solar, 0);
+      const extSum = argonSum + solarSum;
+      const remaining = Math.max(0, base - extSum);
+      const fivePct = Math.round(remaining * .05);
+
       const discounts = {
         none: 0,
-        b2g2: b2(units(items)),
-        b3g3: b3(units(items)),
+        b2g2: groupPromo(unitList, 2, 2),
+        b3g3: groupPromo(unitList, 3, 3),
         triple: items.reduce((a, x) => a + x.triple, 0),
-        argonSolar5: (() => {
-          const ext = items.reduce((a, x) => a + x.argon + x.solar, 0);
-          return ext + Math.round(Math.max(0, base - ext) * .05);
-        })()
+        argonSolar5: extSum + fivePct
       };
-      
       const names = {
         none: 'No promo',
         b2g2: 'Buy 2, get 2',
         b3g3: 'Buy 3, get 3',
         triple: 'Free triple pane',
-        argonSolar5: 'Argon & solar + 5%'
+        argonSolar5: 'Free Low E and Argon + 5%'
       };
-      
+      const minWin = { b2g2: 4, b3g3: 6 };
+
       const promoData = {};
-      let minTotal = Infinity;
-      
-      for (const [key, discount] of Object.entries(discounts)) {
-        let asCost = 0;
-        let tripleCost = 0;
-        let note = '';
-        
+      let minPrice = Infinity;
+      for (const [key, raw] of Object.entries(discounts)) {
+        const eligible = raw !== null;
+        const discount = eligible ? raw : 0;
+        let asCost = 0, tripleCost = 0, note = '';
         if (key === 'triple') {
           tripleCost = items.reduce((a, x) => a + x.triple, 0);
           note = `Free triple pane: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and promo discount ${money(discount)}.`;
         } else if (key === 'argonSolar5') {
-          asCost = items.reduce((a, x) => a + x.argon + x.solar, 0);
-          note = `Argon/solar promo: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and full promo discount ${money(discount)}.`;
+          asCost = extSum;
+          note = `Free Low E and Argon + 5%: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and full promo discount ${money(discount)}.`;
         } else if (key === 'b2g2' || key === 'b3g3') {
           note = `${names[key]}: Tax calculation carries base ${money(base)}, surcharge ${money(sur)}, and promo discount ${money(discount)}.`;
         } else {
           note = 'No promo: base, surcharge, and $0.00 promo discount carried into Tax calculation.';
         }
-        
-        const total = base + sur - discount;
-        promoData[key] = { total, discount, asCost, tripleCost, note };
-        if (total < minTotal) minTotal = total;
+        const price = base - discount;
+        promoData[key] = {
+          eligible, price, discount, asCost, tripleCost, note,
+          total: price + sur,
+          reason: eligible ? '' : `Needs ${minWin[key]}+ windows (you have ${unitCount})`
+        };
+        if (eligible && price < minPrice) minPrice = price;
       }
-      
-      if (!window.userManuallySelectedPromo || !promoData[window.selectedPromo]) {
-        window.selectedPromo = Object.keys(promoData).find(k => promoData[k].total === minTotal);
+
+      const lowestKey = Object.keys(promoData).find(k => promoData[k].eligible && promoData[k].price === minPrice);
+      if (!window.userManuallySelectedPromo || !promoData[window.selectedPromo] || !promoData[window.selectedPromo].eligible) {
+        window.userManuallySelectedPromo = false;
+        window.selectedPromo = lowestKey;
       }
-      
+
       document.getElementById('promo-comparison-card').style.display = 'block';
       const container = document.getElementById('promo-options');
       container.innerHTML = '';
-      
       for (const [key, data] of Object.entries(promoData)) {
         const card = document.createElement('div');
-        const isLowest = data.total === minTotal;
-        card.className = 'promo-card' + (window.selectedPromo === key ? ' selected' : '') + (isLowest ? ' lowest' : '');
-        card.onclick = () => {
-          window.userManuallySelectedPromo = true;
-          window.selectedPromo = key;
-          quote();
-        };
-        
-        const totalStr = money(data.total);
-        const saveStr = data.discount > 0 ? `Saves ${money(data.discount)}` : 'Baseline price';
-        const discStr = `Discount ${money(data.discount)}`;
-        const lowestBadge = data.total === minTotal ? `<div class="promo-lowest">Lowest price</div>` : '';
-        
+        const isLowest = data.eligible && data.price === minPrice;
+        card.className = 'promo-card' + (window.selectedPromo === key ? ' selected' : '') +
+          (isLowest ? ' lowest' : '') + (data.eligible ? '' : ' disabled');
+        if (data.eligible) {
+          card.onclick = () => {
+            window.userManuallySelectedPromo = true;
+            window.selectedPromo = key;
+            quote();
+          };
+        }
+        const lowestBadge = isLowest ? `<div class="promo-lowest">Lowest price</div>` : '';
+        const saveStr = !data.eligible ? data.reason : (data.discount > 0 ? `Saves ${money(data.discount)}` : 'Baseline price');
         card.innerHTML = `
-          <div class="promo-name">${names[key]}</div>
-          <div class="promo-price">${totalStr}</div>
-          <div class="promo-saves">${saveStr}</div>
-          <div class="promo-discount">${discStr}</div>
           ${lowestBadge}
+          <div class="promo-name">${names[key]}</div>
+          <div class="promo-price">${data.eligible ? money(data.price) : 'Not eligible'}</div>
+          <div class="promo-saves">${saveStr}</div>
+          <div class="promo-discount">${data.eligible ? 'Before surcharge' : ''}</div>
         `;
         container.appendChild(card);
       }
-      
+
       const sel = promoData[window.selectedPromo];
       document.getElementById('breakdown-title').textContent = `Selected promo ${names[window.selectedPromo]}`;
-      
       document.getElementById('base').textContent = money(base);
-      document.getElementById('extras').textContent = money(sel.asCost);
-      document.getElementById('tripleRemoved').textContent = money(sel.tripleCost);
       document.getElementById('surchargeTotal').textContent = money(sur);
       document.getElementById('discount').textContent = money(sel.discount);
       document.getElementById('final').textContent = money(sel.total);
-      
+
       let text = (window.selectedPromo === 'none') ? 'No promotion applied.' : `${names[window.selectedPromo]} applied.`;
       if (window.selectedPromo === 'argonSolar5') {
-        text += ` (5% deduction for low E argon: ${money(sel.discount)} off base).`;
+        text = `Free Low E and Argon + 5%: Low E (solar gain) ${money(solarSum)} + Argon ${money(argonSum)} = ${money(extSum)} free, ` +
+          `plus 5% of the remaining base ${money(remaining)} = ${money(fivePct)}. Total promo discount ${money(sel.discount)}.`;
       }
       document.getElementById('explanation').textContent = `${text} Surcharge: ${money(sur)} on original base.`;
 
